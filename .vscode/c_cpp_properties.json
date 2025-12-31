@@ -1,0 +1,40 @@
+{
+  "configurations": [
+    {
+      "name": "windows-gcc-x64",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "${workspaceFolder}/include",
+        "${FREERTOS_PATH}/FreeRTOS/Source/include",
+        "${FREERTOS_PATH}/FreeRTOS/Source",
+        "${FREERTOS_PATH}/FreeRTOS/Source/portable/MSVC-MingW",
+        "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um",
+        "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared",
+        "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/winrt"
+      ],
+      "browse": {
+        "path": [
+          "${workspaceFolder}/include",
+          "${FREERTOS_PATH}/FreeRTOS/Source",
+          "${FREERTOS_PATH}/FreeRTOS/Source/portable/MSVC-MingW",
+          "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um",
+          "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared"
+        ],
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "defines": [
+        "_DEBUG",
+        "UNICODE",
+        "_UNICODE",
+        "WIN32",
+        "_WINDOWS"
+      ],
+      "windowsSdkVersion": "10.0.18362.0",
+      "compilerPath": "C:/MinGW/bin/gcc.exe",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "windows-gcc-x64"
+    }
+  ],
+  "version": 4
+}
