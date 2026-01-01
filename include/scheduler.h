@@ -15,5 +15,7 @@ extern TaskHandle_t scheduler_handle;
 
 void scheduler_register_task(TaskHandle_t task);
 void scheduler_task(void *pvParameters);
+void scheduler_preempt_task(void *pvParameters);
+void scheduler_no_preempt_task(void *pvParameters);
 
 #endif

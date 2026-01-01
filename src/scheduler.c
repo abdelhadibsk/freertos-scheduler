@@ -3,10 +3,8 @@
 #include "task.h"
 
 static List_t sched_task_list;
-static BaseType_t scheduler_initialized = pdFALSE;
-
-static List_t sched_task_list;
 TaskHandle_t scheduler_handle;
+static BaseType_t scheduler_initialized = pdFALSE;
 
 static TaskHandle_t current_task = NULL;
 
@@ -14,7 +12,7 @@ void scheduler_register_task(TaskHandle_t task)
 {
     while (scheduler_initialized == pdFALSE)
     {
-        taskYIELD();   // wait until scheduler initializes list
+        vTaskDelay(pdMS_TO_TICKS(1));   // wait until scheduler initializes list
     }
 
     sched_task_t *entry = pvPortMalloc(sizeof(sched_task_t));
@@ -26,9 +24,10 @@ void scheduler_register_task(TaskHandle_t task)
 
     vListInsertEnd(&sched_task_list, &entry->list_item);
     vTaskSuspend(task);
-}
+} 
 
-
+/* Scheduler task : this function implements a simple round-robin scheduler, 
+allowing each registered task to run for a time slice of 500 ms */
 void scheduler_task(void *pvParameters)
 {
     vListInitialise(&sched_task_list);
@@ -41,6 +40,7 @@ void scheduler_task(void *pvParameters)
         if (listLIST_IS_EMPTY(&sched_task_list))
         {
             vTaskDelay(pdMS_TO_TICKS(100));
+            continue;
         }
 
         /* Pick next task (round-robin) */
@@ -51,18 +51,95 @@ void scheduler_task(void *pvParameters)
         if (current_task != NULL)
             vTaskSuspend(current_task);
 
-        /* Resume next task */
+        /* Notify and resume next task (unblock worker waiting on notification) */
+        xTaskNotifyGive(next_task->handle);
         vTaskResume(next_task->handle);
         current_task = next_task->handle;
 
-        /* Force context switch */
-        taskYIELD();
-
-        /* Time slice */
-        vTaskDelay(pdMS_TO_TICKS(500));
+        /* Wait until worker notifies back, or time slice expires */
+        ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(500));
 
         /* Rotate list */
         uxListRemove(current_item);
         vListInsertEnd(&sched_task_list, current_item);
     }
 }
+
+/* Scheduler simple preemption implementation excute the hiest priority task immediately */
+void scheduler_preempt_task(void *pvParameters)
+{
+    vListInitialise(&sched_task_list);
+    scheduler_initialized = pdTRUE;
+
+    vTaskDelay(pdMS_TO_TICKS(100)); // let system start
+
+    for (;;)
+    {
+        if (listLIST_IS_EMPTY(&sched_task_list))
+        {
+            vTaskDelay(pdMS_TO_TICKS(100));
+            continue;
+        }
+    
+        /* Pick highest priority task */
+        ListItem_t *current_item = listGET_HEAD_ENTRY(&sched_task_list);
+        sched_task_t *next_task = (sched_task_t *) listGET_LIST_ITEM_OWNER(current_item);
+
+        /* Suspend previous task only */
+        if (current_task != NULL)
+            vTaskSuspend(current_task);
+        
+        /* Notify and resume next task (unblock worker waiting on notification) */
+        xTaskNotifyGive(next_task->handle);
+        vTaskResume(next_task->handle);
+        current_task = next_task->handle;
+
+        /* Wait until worker notifies back, or time slice expires */
+        ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(500));
+
+        /* Rotate list */
+        uxListRemove(current_item);
+        vListInsertEnd(&sched_task_list, current_item);
+    }
+}
+
+/* Scheduler no preemption implementation */
+void scheduler_no_preempt_task(void *pvParameters)
+{
+    vListInitialise(&sched_task_list);
+    scheduler_initialized = pdTRUE;
+
+    vTaskDelay(pdMS_TO_TICKS(100)); // let system start
+
+    for (;;)
+    {
+        if (listLIST_IS_EMPTY(&sched_task_list))
+        {
+            vTaskDelay(pdMS_TO_TICKS(100));
+            continue;
+        }
+
+        /* Pick highest priority task */
+        ListItem_t *current_item = listGET_HEAD_ENTRY(&sched_task_list);
+        sched_task_t *next_task = (sched_task_t *) listGET_LIST_ITEM_OWNER(current_item);
+
+        /* Suspend previous task only */
+        if (current_task != NULL)
+            vTaskSuspend(current_task);     
+
+        /* Notify and resume next task (unblock worker waiting on notification) */
+        xTaskNotifyGive(next_task->handle); 
+        vTaskResume(next_task->handle);
+        current_task = next_task->handle;
+
+        /* Wait until worker notifies back */
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+        /* Rotate list */
+        uxListRemove(current_item);
+        vListInsertEnd(&sched_task_list, current_item);
+
+
+    }
+}
+

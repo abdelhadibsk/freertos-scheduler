@@ -17,7 +17,7 @@
 #define INCLUDE_vTaskSuspend    1
 #define INCLUDE_vTaskResume     1
 
-#define configCHECK_FOR_STACK_OVERFLOW 2
+#define configCHECK_FOR_STACK_OVERFLOW  2
 
 #define configUSE_IDLE_HOOK             0
 #define configUSE_TICK_HOOK             0
