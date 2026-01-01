@@ -7,7 +7,15 @@ TaskHandle_t scheduler_handle;
 static BaseType_t scheduler_initialized = pdFALSE;
 
 static TaskHandle_t current_task = NULL;
+static List_t ready_list; // from the other branch
 
+void scheduler_init(void)   // other branch
+{
+    vListInitialise(&ready_list);
+    xTaskCreate(scheduler_task, "Scheduler", configMINIMAL_STACK_SIZE, NULL, SCHEDULER_PRIORITY, NULL);
+}
+
+/* Register a task with the scheduler and suspend it until scheduled */
 void scheduler_register_task(TaskHandle_t task)
 {
     while (scheduler_initialized == pdFALSE)
@@ -33,14 +41,14 @@ void scheduler_task(void *pvParameters)
     vListInitialise(&sched_task_list);
     scheduler_initialized = pdTRUE;
 
-    vTaskDelay(pdMS_TO_TICKS(100)); // let system start
+    vTaskDelay(pdMS_TO_TICKS(10)); // let system start duration : 10 ms
 
     for (;;)
-    {
+    {   // if no registered tasks, wait
         if (listLIST_IS_EMPTY(&sched_task_list))
         {
             vTaskDelay(pdMS_TO_TICKS(100));
-            continue;
+            continue;   // the line will jump to the beginning of the for loop
         }
 
         /* Pick next task (round-robin) */

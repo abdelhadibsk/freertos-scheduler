@@ -3,7 +3,6 @@
 
 #define configUSE_PREEMPTION            1
 #define configUSE_TIME_SLICING          1
-
 #define configCPU_CLOCK_HZ              ( ( unsigned long ) 100000000 )
 #define configTICK_RATE_HZ              ( ( TickType_t ) 1000 )
 
@@ -20,14 +19,16 @@
 #define configCHECK_FOR_STACK_OVERFLOW  2
 
 #define configUSE_IDLE_HOOK             0
-#define configUSE_TICK_HOOK             0
+#define configUSE_TICK_HOOK             1
 
 #define configUSE_TRACE_FACILITY        1
 #define configUSE_16_BIT_TICKS          0
 
-#define configCHECK_FOR_STACK_OVERFLOW  2
+#define configUSE_STATS_FORMATTING_FUNCTIONS    1
 
 #define configASSERT(x) \
     if((x) == 0) { taskDISABLE_INTERRUPTS(); for(;;); }
+
+
 
 #endif
