@@ -3,17 +3,17 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "list.h"
 
-/* Number of user tasks */
-#define TASK_COUNT 3
+typedef struct
+{
+    TaskHandle_t handle;
+    ListItem_t  list_item;
+} sched_task_t;
 
 extern TaskHandle_t scheduler_handle;
-extern TaskHandle_t user_tasks[TASK_COUNT];
 
-/* Scheduler task */
+void scheduler_register_task(TaskHandle_t task);
 void scheduler_task(void *pvParameters);
-
-/* Worker task */
-void worker_task(void *pvParameters);
 
 #endif
