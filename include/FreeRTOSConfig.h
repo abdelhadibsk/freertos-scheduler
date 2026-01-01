@@ -16,6 +16,8 @@
 #define INCLUDE_vTaskSuspend    1
 #define INCLUDE_vTaskResume     1
 
+#define INCLUDE_uxTaskPriorityGet  1
+
 #define configCHECK_FOR_STACK_OVERFLOW  2
 
 #define configUSE_IDLE_HOOK             0
@@ -29,6 +31,8 @@
 #define configASSERT(x) \
     if((x) == 0) { taskDISABLE_INTERRUPTS(); for(;;); }
 
+#define traceTASK_SWITCHED_IN()   MyTaskSwitchedIn(pxCurrentTCB)
+#define traceTASK_SWITCHED_OUT()  MyTaskSwitchedOut(pxCurrentTCB)
 
 
 #endif

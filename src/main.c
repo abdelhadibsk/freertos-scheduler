@@ -7,6 +7,8 @@ void worker_task(void *pvParameters);
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName);
 void vApplicationTickHook(void);
 
+void MyTaskSwitchedIn(void);
+void MyTaskSwitchedOut(void);
 
 int main(void)
 {
@@ -55,7 +57,7 @@ void worker_task(void *pvParameters)
     }
 }
 
-
+// Stack overflow hook
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
     (void) xTask;
@@ -78,4 +80,20 @@ void vApplicationTickHook(void)
     }
 }
 
+/* Task switch in/out hooks for tracing */
+void MyTaskSwitchedIn(void)
+{
+    TaskHandle_t h = xTaskGetCurrentTaskHandle();
+
+    printf("[IN ] %s (prio %lu)\n",
+           pcTaskGetName(h),
+           (unsigned long)uxTaskPriorityGet(h));
+}
+
+void MyTaskSwitchedOut(void)
+{
+    TaskHandle_t h = xTaskGetCurrentTaskHandle();
+    printf("[OUT] %s\n", pcTaskGetName(h));
+
+}
 

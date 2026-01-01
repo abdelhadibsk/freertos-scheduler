@@ -12,7 +12,7 @@ static List_t ready_list; // from the other branch
 void scheduler_init(void)   // other branch
 {
     vListInitialise(&ready_list);
-    xTaskCreate(scheduler_task, "Scheduler", configMINIMAL_STACK_SIZE, NULL, SCHEDULER_PRIORITY, NULL);
+    xTaskCreate(scheduler_task, "Scheduler", configMINIMAL_STACK_SIZE, NULL, SCHEDULER_PRIORITY, &scheduler_handle);
 }
 
 /* Register a task with the scheduler and suspend it until scheduled */
