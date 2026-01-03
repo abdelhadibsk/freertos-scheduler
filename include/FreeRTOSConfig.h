@@ -23,16 +23,20 @@
 #define configUSE_IDLE_HOOK             0
 #define configUSE_TICK_HOOK             1
 
+/* Enable task state hook */
+#define configUSE_TASK_STATE_HOOK       1
+
 #define configUSE_TRACE_FACILITY        1
 #define configUSE_16_BIT_TICKS          0
 
+/* Keep stats formatting but remove run-time stats */
 #define configUSE_STATS_FORMATTING_FUNCTIONS    1
+/* Remove this line: #define configGENERATE_RUN_TIME_STATS   1 */
 
 #define configASSERT(x) \
     if((x) == 0) { taskDISABLE_INTERRUPTS(); for(;;); }
 
-#define traceTASK_SWITCHED_IN()   MyTaskSwitchedIn(pxCurrentTCB)
-#define traceTASK_SWITCHED_OUT()  MyTaskSwitchedOut(pxCurrentTCB)
+#define traceTASK_SWITCHED_IN()   MyTaskSwitchedIn()
+#define traceTASK_SWITCHED_OUT()  MyTaskSwitchedOut()
 
-
-#endif
+#endif /* FREERTOS_CONFIG_H */

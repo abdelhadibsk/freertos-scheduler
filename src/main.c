@@ -1,6 +1,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "scheduler.h"
+#include <stdio.h>
 
 void worker_task(void *pvParameters);
 
@@ -10,27 +11,30 @@ void vApplicationTickHook(void);
 void MyTaskSwitchedIn(void);
 void MyTaskSwitchedOut(void);
 
+/* Add hook function prototype */
+void vApplicationTaskStateHook(TaskHandle_t xTask, eTaskState eCurrentState);
+void show_specific_task_states(void);
+
+/* Add function to display all task states */
+void show_all_tasks_states(void);
+
+TaskHandle_t tA, tB, tC, tD;
+
 int main(void)
 {
-    TaskHandle_t t;
-    // testing the rond-robin scheduler    
-    //xTaskCreate(scheduler_task, "SCHED", 1024, NULL, configMAX_PRIORITIES - 1, &scheduler_handle);   
     
     scheduler_init();
 
-    // testing preemptive scheduler
-    //xTaskCreate(scheduler_preempt_task, "SCHED", 1024, NULL, configMAX_PRIORITIES - 1, &scheduler_handle);
-
-    xTaskCreate(worker_task, "A", 1024, "Task A", 2, &t);
-    xTaskCreate(worker_task, "B", 1024, "Task B", 1, &t);
-    xTaskCreate(worker_task, "C", 1024, "Task C", 2, &t);
-    xTaskCreate(worker_task, "D", 1024, "Task D", 1, &t); 
+    // Store task handles to check states later
+    xTaskCreate(worker_task, "A", 1024, "Task A", 2, &tA);
+    xTaskCreate(worker_task, "B", 1024, "Task B", 1, &tB);
+    xTaskCreate(worker_task, "C", 1024, "Task C", 2, &tC);
+    xTaskCreate(worker_task, "D", 1024, "Task D", 1, &tD); 
 
     printf("Tasks created. Starting scheduler...\n");
 
     vTaskStartScheduler();
     for (;;);
-
 } 
 
 
@@ -67,19 +71,6 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
     for (;;);
 }
 
-// Tick hook - called every RTOS tick
-void vApplicationTickHook(void)
-{
-    static TickType_t tickCount = 0;
-    tickCount++;
-    
-    if ((tickCount % 100) == 0) // every 100 ticks
-    {
-        // Toggle LED or print heartbeat
-        printf("[TICK] %lu ticks elapsed\n", (unsigned long)tickCount);
-    }
-}
-
 /* Task switch in/out hooks for tracing */
 void MyTaskSwitchedIn(void)
 {
@@ -94,6 +85,74 @@ void MyTaskSwitchedOut(void)
 {
     TaskHandle_t h = xTaskGetCurrentTaskHandle();
     printf("[OUT] %s\n", pcTaskGetName(h));
-
 }
 
+/* Task state hook - called when a task's state changes */
+void vApplicationTaskStateHook(TaskHandle_t xTask, eTaskState eCurrentState)
+{
+    const char *pcTaskName = pcTaskGetName(xTask);
+    const char *pcStateString;
+    
+    switch(eCurrentState)
+    {
+        case eRunning:   pcStateString = "Running"; break;
+        case eReady:     pcStateString = "Ready"; break;
+        case eBlocked:   pcStateString = "Blocked"; break;
+        case eSuspended: pcStateString = "Suspended"; break;
+        case eDeleted:   pcStateString = "Deleted"; break;
+        default:         pcStateString = "Invalid"; break;
+    }
+    
+    printf("[STATE-HOOK] Task %s changed state to: %s\n", 
+           pcTaskName ? pcTaskName : "Unknown", 
+           pcStateString);
+}
+
+/* Function to display all task states */
+/* Simple function to show basic task states without using uxTaskGetSystemState */
+
+void show_specific_task_states(void)
+{
+    TaskHandle_t tasks[] = {tA, tB, tC, tD, scheduler_handle};
+    const char* names[] = {"A", "B", "C", "D", "Scheduler"};
+    
+    printf("\n--- Specific Task States ---\n");
+    for(int i = 0; i < 5; i++)
+    {
+        if(tasks[i] != NULL)
+        {
+            eTaskState state = eTaskGetState(tasks[i]);
+            const char *state_str;
+            
+            switch(state)
+            {
+                case eRunning:   state_str = "Running"; break;
+                case eReady:     state_str = "Ready"; break;
+                case eBlocked:   state_str = "Blocked"; break;
+                case eSuspended: state_str = "Suspended"; break;
+                case eDeleted:   state_str = "Deleted"; break;
+                default:         state_str = "Unknown"; break;
+            }
+            
+            printf("Task %s: %s\n", names[i], state_str);
+        }
+    }
+    printf("----------------------------\n");
+}
+
+// And update the tick hook to use the simpler version:
+void vApplicationTickHook(void)
+{
+    static TickType_t tickCount = 0;
+    tickCount++;
+    
+    if ((tickCount % 10) == 0)
+    {
+        printf("[TICK] %lu ticks elapsed\n", (unsigned long)tickCount);
+        
+        if ((tickCount % 50) == 0) 
+        {
+            show_specific_task_states();
+        }
+    }
+}
