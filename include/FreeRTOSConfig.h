@@ -1,7 +1,9 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
-#define configUSE_PREEMPTION            1
+#define configUSE_PREEMPTION            0
+#define configRUN_MULTIPLE_PRIORITIES    1
+
 #define configUSE_TIME_SLICING          1
 #define configCPU_CLOCK_HZ              ( ( unsigned long ) 100000000 )
 #define configTICK_RATE_HZ              ( ( TickType_t ) 1000 )
@@ -28,6 +30,8 @@
 
 #define configUSE_TRACE_FACILITY        1
 #define configUSE_16_BIT_TICKS          0
+
+#define INCLUDE_vTaskDelayUntil    1
 
 /* Keep stats formatting but remove run-time stats */
 #define configUSE_STATS_FORMATTING_FUNCTIONS    1

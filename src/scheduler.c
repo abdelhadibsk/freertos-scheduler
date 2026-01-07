@@ -74,6 +74,7 @@ void scheduler_task(void *pvParameters)
 }
 
 /* Scheduler simple preemption implementation excute the hiest priority task immediately */
+//fonctionne pas correctement
 void scheduler_preempt_task(void *pvParameters)
 {
     vListInitialise(&sched_task_list);
@@ -112,6 +113,7 @@ void scheduler_preempt_task(void *pvParameters)
 }
 
 /* Scheduler no preemption implementation */
+//fonctionne pas correctement 
 void scheduler_no_preempt_task(void *pvParameters)
 {
     vListInitialise(&sched_task_list);

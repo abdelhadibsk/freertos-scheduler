@@ -39,25 +39,27 @@ int main(void)
 
 
 /* USER TASK */
-void worker_task(void *pvParameters)
-{
-    const char *name = (const char *) pvParameters;
-
-    /* Register self with scheduler (will block until scheduler initializes and then suspend the task) */
+void worker_task(void *pvParameters) {
+    const char *name = (const char *)pvParameters;
     scheduler_register_task(xTaskGetCurrentTaskHandle());
-
-    for (;;)
-    {
-        /* Wait until scheduler allows execution */
+    
+    TickType_t lastWakeTime = xTaskGetTickCount();
+    
+    for (;;) {
+        // Wait for scheduler to resume us
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-
-        /* Simulated work */
-        printf("%s\n", name);
-        vTaskDelay(pdMS_TO_TICKS(500));
-
-        /* Notify scheduler that we are done */
+        
+        printf("%s starting work\n", name);
+        
+        // Do work in small chunks, yield frequently
+        for (int i = 0; i < 5; i++) {
+            printf("%s working...\n", name);
+            vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(100));  // 100ms chunks
+            taskYIELD();
+        }
+        
+        printf("%s done, notifying scheduler\n", name);
         xTaskNotifyGive(scheduler_handle);
-        taskYIELD();
     }
 }
 
@@ -146,11 +148,11 @@ void vApplicationTickHook(void)
     static TickType_t tickCount = 0;
     tickCount++;
     
-    if ((tickCount % 10) == 0)
+    if ((tickCount % 100) == 0)
     {
         printf("[TICK] %lu ticks elapsed\n", (unsigned long)tickCount);
         
-        if ((tickCount % 50) == 0) 
+        if ((tickCount % 100) == 0) 
         {
             show_specific_task_states();
         }
