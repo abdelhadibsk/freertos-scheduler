@@ -5,6 +5,10 @@
 #include "task.h"
 
 #define MAX_TASKS  8
+//define scheduler prioritie
+#define configSCHEDULER_PRIORITY  ( configMAX_PRIORITIES - 1 )
+//define task priority max
+#define configTASK_PRIORITY_MAX   ( configSCHEDULER_PRIORITY - 1 )
 
 typedef enum {
     SCHED_FIFO,
@@ -16,6 +20,7 @@ typedef struct {
     TaskHandle_t handle;
     TickType_t   period;
     TickType_t   deadline;
+    TickType_t   wcet; // worst-case execution time to be added later
 } sched_task_t;
 
 /* API */

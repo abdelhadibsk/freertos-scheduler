@@ -8,13 +8,11 @@
 #define configRUN_MULTIPLE_PRIORITIES   1
 
 
-
 /* ================= CPU & TICK ================= */
 
-#define configCPU_CLOCK_HZ              ( ( unsigned long ) 100000000 ) /* à adapter */
-#define configTICK_RATE_HZ              ( ( TickType_t ) 1000 )
-
-#define configUSE_16_BIT_TICKS  0
+#define configCPU_CLOCK_HZ              ( ( unsigned long ) 100000000 ) /* 100 MHz CPU clock */
+#define configTICK_RATE_HZ              ( ( TickType_t ) 1000 ) /* 1ms tick */
+#define configUSE_16_BIT_TICKS          0
 
 
 /* ================= TASKS ================= */
@@ -22,16 +20,13 @@
 #define configMAX_PRIORITIES            10
 #define configMINIMAL_STACK_SIZE        256
 #define configTOTAL_HEAP_SIZE           ( 20 * 1024 )
-
-#define configCHECK_FOR_STACK_OVERFLOW  2
-
-#define configUSE_TASK_NOTIFICATIONS    1
+#define configUSE_TASK_NOTIFICATIONS    1 
 
 /* ================= HOOKS ================= */
 
 #define configCHECK_FOR_STACK_OVERFLOW  2
-#define configUSE_IDLE_HOOK             0
-#define configUSE_TICK_HOOK             1   /* inutile pour le projet */
+#define configUSE_IDLE_HOOK             0   // to enable vApplicationIdleHook
+#define configUSE_TICK_HOOK             1   // to enable vApplicationTickHook
 
 /* ================= TRACE (pour [IN]/[OUT]) ================= */
 
@@ -47,8 +42,8 @@
 #define INCLUDE_vTaskDelayUntil         1
 #define INCLUDE_vTaskSuspend            1
 #define INCLUDE_vTaskResume             1
-#define INCLUDE_uxTaskPriorityGet       1
-#define INCLUDE_vTaskPrioritySet        1
+#define INCLUDE_uxTaskPriorityGet       1   //to use uxTaskPriorityGet in MyTaskSwitchedIn/Out
+#define INCLUDE_vTaskPrioritySet        1   //to use vTaskPrioritySet in scheduler_apply_policy
 
 //include pour utiliser vTaskDelete
 #define INCLUDE_vTaskDelete             1

@@ -61,7 +61,7 @@ void scheduler_apply_policy(sched_policy_t policy)
     /* Assign priorities: highest priority = smallest index */
     for (int i = 0; i < task_count; i++)
     {   printf("Setting priority for task %d\n", i);
-        UBaseType_t prio = configMAX_PRIORITIES - 1 - i;
+        UBaseType_t prio = configTASK_PRIORITY_MAX - i;
         vTaskPrioritySet(task_table[i].handle, prio);   // the problem was here
         printf("Set priority %llu for task %p\n", prio, (void*)task_table[i].handle);
     }
