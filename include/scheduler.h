@@ -3,23 +3,26 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
-#include "list.h"
 
-#define SCHEDULER_PRIORITY          (configMAX_PRIORITIES - 1)
+#define MAX_TASKS  8
 
-typedef struct
-{
+typedef enum {
+    SCHED_FIFO,
+    SCHED_RM,
+    SCHED_DM
+} sched_policy_t;
+
+typedef struct {
     TaskHandle_t handle;
-    ListItem_t  list_item;
+    TickType_t   period;
+    TickType_t   deadline;
 } sched_task_t;
 
-extern TaskHandle_t scheduler_handle;
-
-void scheduler_register_task(TaskHandle_t task);
-void scheduler_task(void *pvParameters);
-void scheduler_preempt_task(void *pvParameters);
-void scheduler_no_preempt_task(void *pvParameters);
-
-
+/* API */
+void scheduler_init(void);
+void scheduler_register_task(TaskHandle_t task,
+                             TickType_t period,
+                             TickType_t deadline);
+void scheduler_apply_policy(sched_policy_t policy);
 
 #endif

@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 void worker_task(void *pvParameters);
+void init_task(void *p);
 
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName);
 void vApplicationTickHook(void);
@@ -21,45 +22,61 @@ void show_all_tasks_states(void);
 TaskHandle_t tA, tB, tC, tD;
 
 int main(void)
-{
-    
+{   
+    printf("MAIN START\n");
+    setvbuf(stdout, NULL, _IONBF, 0);
+    printf("STDOUT UNBUFFERED\n");
+
     scheduler_init();
 
-    // Store task handles to check states later
-    xTaskCreate(worker_task, "A", 1024, "Task A", 2, &tA);
-    xTaskCreate(worker_task, "B", 1024, "Task B", 1, &tB);
-    xTaskCreate(worker_task, "C", 1024, "Task C", 2, &tC);
-    xTaskCreate(worker_task, "D", 1024, "Task D", 1, &tD); 
+    xTaskCreate(worker_task, "A", 1024, "A", 1, &tA);
+    xTaskCreate(worker_task, "B", 1024, "B", 1, &tB);
+    xTaskCreate(worker_task, "C", 1024, "C", 1, &tC);
+    printf("tasks created\n");
+    fflush(stdout);
 
-    printf("Tasks created. Starting scheduler...\n");
+
+    scheduler_register_task(tA, 100, 100);
+    scheduler_register_task(tB, 200, 200);
+    scheduler_register_task(tC, 400, 400);
+    printf("tasks registered\n");
+    fflush(stdout);
+
+    /* Choose scheduling policy */
+    // scheduler_apply_policy(SCHED_RM);
+    // printf("policy applied\n");
+    // fflush(stdout);
+    // scheduler_apply_policy(SCHED_DM);
+    // scheduler_apply_policy(SCHED_FIFO);
+
+    xTaskCreate(init_task, "Init", 1024, NULL, configMAX_PRIORITIES - 1, NULL);
+    printf("Starting scheduler\n");
+    fflush(stdout);
 
     vTaskStartScheduler();
     for (;;);
-} 
+}
+
+void init_task(void *p)
+{
+    printf("INIT TASK START\n");
+
+    scheduler_apply_policy(SCHED_RM);
+
+    printf("INIT TASK DONE\n");
+    vTaskDelete(NULL);
+}
 
 
 /* USER TASK */
-void worker_task(void *pvParameters) {
+void worker_task(void *pvParameters)
+{
     const char *name = (const char *)pvParameters;
-    scheduler_register_task(xTaskGetCurrentTaskHandle());
-    
-    TickType_t lastWakeTime = xTaskGetTickCount();
-    
-    for (;;) {
-        // Wait for scheduler to resume us
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        
-        printf("%s starting work\n", name);
-        
-        // Do work in small chunks, yield frequently
-        for (int i = 0; i < 5; i++) {
-            printf("%s working...\n", name);
-            vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(100));  // 100ms chunks
-            taskYIELD();
-        }
-        
-        printf("%s done, notifying scheduler\n", name);
-        xTaskNotifyGive(scheduler_handle);
+
+    for (;;)
+    {
+        printf("Task %s running\n", name);
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
@@ -113,6 +130,8 @@ void vApplicationTaskStateHook(TaskHandle_t xTask, eTaskState eCurrentState)
 /* Function to display all task states */
 /* Simple function to show basic task states without using uxTaskGetSystemState */
 
+
+/*
 void show_specific_task_states(void)
 {
     TaskHandle_t tasks[] = {tA, tB, tC, tD, scheduler_handle};
@@ -141,8 +160,10 @@ void show_specific_task_states(void)
     }
     printf("----------------------------\n");
 }
+*/
 
 // And update the tick hook to use the simpler version:
+
 void vApplicationTickHook(void)
 {
     static TickType_t tickCount = 0;
@@ -151,10 +172,11 @@ void vApplicationTickHook(void)
     if ((tickCount % 100) == 0)
     {
         printf("[TICK] %lu ticks elapsed\n", (unsigned long)tickCount);
-        
+        /*
         if ((tickCount % 100) == 0) 
         {
             show_specific_task_states();
         }
+        */    
     }
 }
