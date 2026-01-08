@@ -18,16 +18,18 @@ typedef enum {
 
 typedef struct {
     TaskHandle_t handle;
-    TickType_t   period;
-    TickType_t   deadline;
-    TickType_t   wcet; // worst-case execution time to be added later
+
+    TickType_t   period;     // Pᵢ
+    TickType_t   deadline;   // Dᵢ (future)
+    TickType_t   exec_time;  // Cᵢ (budget par job)
+
+    TickType_t   last_release; // rᵢ(k)
 } sched_task_t;
+
 
 /* API */
 void scheduler_init(void);
-void scheduler_register_task(TaskHandle_t task,
-                             TickType_t period,
-                             TickType_t deadline);
+void scheduler_register_task(TaskHandle_t task, TickType_t period, TickType_t deadline);
 void scheduler_apply_policy(sched_policy_t policy);
 
 #endif

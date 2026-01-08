@@ -11,6 +11,7 @@ void scheduler_init(void)
     task_count = 0;
 }
 
+
 /* Register a task with its temporal parameters */
 void scheduler_register_task(TaskHandle_t task,
                              TickType_t period,
@@ -25,10 +26,11 @@ void scheduler_register_task(TaskHandle_t task,
     task_count++;
 }
 
-/* Apply scheduling policy by updating FreeRTOS priorities */
+// Apply scheduling policy by updating FreeRTOS priorities 
 
-void scheduler_apply_policy(sched_policy_t policy)
-{   printf("Applying scheduling policy %d\n", policy);
+void scheduler_apply_policy(sched_policy_t policy){   
+    
+    printf("Applying scheduling policy %d\n", policy);
     /* Simple bubble sort on period/deadline */
     for (int i = 0; i < task_count - 1; i++)
     {

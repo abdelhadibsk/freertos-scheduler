@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 void worker_task(void *pvParameters);
+void periodic_task(void *pvParameters);
 void init_task(void *p);
 
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName);
@@ -12,9 +13,6 @@ void vApplicationTickHook(void);
 void MyTaskSwitchedIn(void);
 void MyTaskSwitchedOut(void);
 
-/* Add hook function prototype */
-void vApplicationTaskStateHook(TaskHandle_t xTask, eTaskState eCurrentState);
-
 
 TaskHandle_t tA, tB, tC, tD;
 
@@ -22,20 +20,36 @@ int main(void)
 {   
     printf("MAIN START\n");
     setvbuf(stdout, NULL, _IONBF, 0);
-    printf("STDOUT UNBUFFERED\n");
 
     scheduler_init();
 
-    xTaskCreate(worker_task, "A", 1024, "A", 1, &tA);
-    xTaskCreate(worker_task, "B", 1024, "B", 1, &tB);
-    xTaskCreate(worker_task, "C", 1024, "C", 1, &tC);
+    /* -------- Task A -------- */
+    sched_task_t taskA, taskB, taskC;
+    // tasks parameters
+    taskA.period    = pdMS_TO_TICKS(100);   // Ti = 100ms
+    taskA.deadline  = pdMS_TO_TICKS(100);   // Di = 100ms
+    taskA.exec_time = pdMS_TO_TICKS(20);    // Ci = 20ms
+    taskA.handle = tA;
+
+    taskB.period    = pdMS_TO_TICKS(200);
+    taskB.deadline  = pdMS_TO_TICKS(200);
+    taskB.exec_time = pdMS_TO_TICKS(40);
+    taskB.handle = tB;
+
+    taskC.period    = pdMS_TO_TICKS(400);   
+    taskC.deadline  = pdMS_TO_TICKS(400);
+    taskC.exec_time = pdMS_TO_TICKS(60);
+    taskC.handle = tC;
+
+    xTaskCreate(periodic_task, "A", 1024, &taskA, 1, &tA); 
+    xTaskCreate(periodic_task, "B", 1024, &taskB, 1, &tB);
+    xTaskCreate(periodic_task, "C", 1024, &taskC, 1, &tC);
     printf("tasks created\n");
     fflush(stdout);
 
-    scheduler_register_task(tA, 100, 100);
-    scheduler_register_task(tB, 200, 200);
-    scheduler_register_task(tC, 400, 400);
-
+    scheduler_register_task(tA, taskA.period, taskA.deadline);
+    scheduler_register_task(tB, taskB.period, taskB.deadline);
+    scheduler_register_task(tC, taskC.period, taskC.deadline);
     printf("tasks registered\n");
     fflush(stdout);
 
@@ -62,7 +76,6 @@ void init_task(void *p)
     vTaskDelete(NULL);
 }
 
-
 /* USER TASK */
 void worker_task(void *pvParameters)
 {
@@ -72,6 +85,43 @@ void worker_task(void *pvParameters)
     {
         printf("Task %s running\n", name);
         vTaskDelay(pdMS_TO_TICKS(100)); // to simulate work
+    }
+}
+
+/* PERIODIC TASK WITH CONTROLLED EXECUTION TIME */
+void periodic_task(void *pvParameters)
+{
+    sched_task_t *task = (sched_task_t *)pvParameters;
+
+    TickType_t lastWakeTime = xTaskGetTickCount();
+
+    for (;;)
+    {
+        /* ===== Activation périodique stricte ===== */
+        vTaskDelayUntil(&lastWakeTime, task->period);
+        task->last_release = lastWakeTime;
+
+        /* ===== Début du job ===== */
+        printf("[JOB START] Task %s at %lu\n",
+               pcTaskGetName(NULL),
+               (unsigned long)lastWakeTime);
+
+        TickType_t exec_start = xTaskGetTickCount();
+
+        /* ===== Exécution contrôlée ===== */
+        while ((xTaskGetTickCount() - exec_start) < task->exec_time)
+        {
+            /* Travail simulé */
+            //taskYIELD();  // permet la préemption utile cas de priorité égale
+        }
+
+        /* ===== Fin du job ===== */
+        TickType_t finish = xTaskGetTickCount();
+
+        printf("[JOB END] Task %s at %lu (exec = %lu)\n",
+               pcTaskGetName(NULL),
+               (unsigned long)finish,
+               (unsigned long)(finish - exec_start));
     }
 }
 
@@ -100,6 +150,7 @@ void MyTaskSwitchedOut(void)
 }
 
 // And update the tick hook to use the simpler version:
+
 void vApplicationTickHook(void)
 {
     static TickType_t tickCount = 0;
@@ -116,3 +167,4 @@ void vApplicationTickHook(void)
         */    
     }
 }
+
