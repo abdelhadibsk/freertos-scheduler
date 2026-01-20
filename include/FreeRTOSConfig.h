@@ -14,10 +14,9 @@
 #define configTICK_RATE_HZ              ( ( TickType_t ) 1000 ) /* 1ms tick */
 #define configUSE_16_BIT_TICKS          0
 
-
 /* ================= TASKS ================= */
 
-#define configMAX_PRIORITIES            10
+#define configMAX_PRIORITIES            10  // max number of tasks
 #define configMINIMAL_STACK_SIZE        256
 #define configTOTAL_HEAP_SIZE           ( 20 * 1024 )
 #define configUSE_TASK_NOTIFICATIONS    1 
@@ -30,8 +29,8 @@
 
 /* ================= TRACE (pour [IN]/[OUT]) ================= */
 
-#define configUSE_TRACE_FACILITY        1
-#define configUSE_STATS_FORMATTING_FUNCTIONS 1
+#define configUSE_TRACE_FACILITY                1
+#define configUSE_STATS_FORMATTING_FUNCTIONS    1
 
 #define traceTASK_SWITCHED_IN()   MyTaskSwitchedIn()
 #define traceTASK_SWITCHED_OUT()  MyTaskSwitchedOut()
@@ -39,9 +38,9 @@
 /* ================= API INCLUSION ================= */
 
 #define INCLUDE_vTaskDelay              1
-// #define INCLUDE_vTaskDelayUntil         1        not found in task.c
 #define INCLUDE_vTaskSuspend            1
 #define INCLUDE_vTaskResume             1
+// #define INCLUDE_vTaskDelayUntil      1   // not found in task.c
 #define INCLUDE_xTaskDelayUntil         1
 
 #define INCLUDE_uxTaskPriorityGet       1   //to use uxTaskPriorityGet in MyTaskSwitchedIn/Out

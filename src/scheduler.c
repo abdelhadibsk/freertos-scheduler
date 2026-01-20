@@ -65,6 +65,7 @@ void scheduler_apply_policy(sched_policy_t policy){
     {   printf("Setting priority for task %d\n", i);
         UBaseType_t prio = configTASK_PRIORITY_MAX - i;
         vTaskPrioritySet(task_table[i].handle, prio);   // the problem was here
+        // comment appeler un hook
         printf("Set priority %llu for task %p\n", prio, (void*)task_table[i].handle);
     }
 }

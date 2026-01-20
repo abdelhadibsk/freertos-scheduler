@@ -6,7 +6,7 @@
 
 #define MAX_TASKS  8
 //define scheduler prioritie
-#define configSCHEDULER_PRIORITY  ( configMAX_PRIORITIES - 1 )
+#define configSCHEDULER_PRIORITY  ( configMAX_PRIORITIES - 1 )  // nombre de tasks +1 
 //define task priority max
 #define configTASK_PRIORITY_MAX   ( configSCHEDULER_PRIORITY - 1 )
 
@@ -22,8 +22,8 @@ typedef struct {
     TickType_t   period;     // Pᵢ
     TickType_t   deadline;   // Dᵢ (future)
     TickType_t   exec_time;  // Cᵢ (budget par job)
-
-    TickType_t   last_release; // rᵢ(k)
+    //offcet
+    TickType_t   last_release; // rᵢ(k) last release time
 } sched_task_t;
 
 

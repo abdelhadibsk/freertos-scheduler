@@ -13,7 +13,6 @@ void vApplicationTickHook(void);
 void MyTaskSwitchedIn(void);
 void MyTaskSwitchedOut(void);
 
-
 TaskHandle_t tA, tB, tC, tD;
 
 int main(void)
@@ -21,12 +20,13 @@ int main(void)
     printf("MAIN START\n");
     setvbuf(stdout, NULL, _IONBF, 0);
 
-    scheduler_init();
+    scheduler_init();   //count 0
 
-    /* -------- Task A -------- */
+    // Create user tasks
     sched_task_t taskA, taskB, taskC;
+
     // tasks parameters
-    taskA.period    = pdMS_TO_TICKS(100);   // Ti = 100ms
+    taskA.period    = pdMS_TO_TICKS(1000);   // Ti = 100ms
     taskA.deadline  = pdMS_TO_TICKS(100);   // Di = 100ms
     taskA.exec_time = pdMS_TO_TICKS(20);    // Ci = 20ms
     taskA.handle = tA;
@@ -65,7 +65,7 @@ void init_task(void *p)
 {
     printf("INIT TASK START\n");
 
-    /* Choose scheduling policy */
+    // Choose scheduling policy 
     // scheduler_apply_policy(SCHED_RM);
     // scheduler_apply_policy(SCHED_DM);
     // scheduler_apply_policy(SCHED_FIFO);
@@ -74,10 +74,11 @@ void init_task(void *p)
 
     printf("INIT TASK DONE\n");
     vTaskDelete(NULL);
+    
 }
 
-/* USER TASK */
-void worker_task(void *pvParameters)
+// Simple worker task (not periodic, for testing)
+void worker_task(void *pvParameters)    
 {
     const char *name = (const char *)pvParameters;
 
@@ -87,12 +88,12 @@ void worker_task(void *pvParameters)
         vTaskDelay(pdMS_TO_TICKS(100)); // to simulate work
     }
 }
+// task apériodique isr , etats 
 
-/* PERIODIC TASK WITH CONTROLLED EXECUTION TIME */
+// PERIODIC TASK WITH CONTROLLED EXECUTION TIME 
 void periodic_task(void *pvParameters)
 {
     sched_task_t *task = (sched_task_t *)pvParameters;
-
     TickType_t lastWakeTime = xTaskGetTickCount();
 
     for (;;)
@@ -110,8 +111,7 @@ void periodic_task(void *pvParameters)
 
         /* ===== Exécution contrôlée ===== */
         while ((xTaskGetTickCount() - exec_start) < task->exec_time)
-        {
-            /* Travail simulé */
+        {   // simulate work
             //taskYIELD();  // permet la préemption utile cas de priorité égale
         }
 
@@ -135,7 +135,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
     for (;;);
 }
 
-/* Task switch in/out hooks for tracing */
+// Task switch in/out hooks for tracing 
 void MyTaskSwitchedIn(void)
 {
     TaskHandle_t h = xTaskGetCurrentTaskHandle();
@@ -150,12 +150,11 @@ void MyTaskSwitchedOut(void)
 }
 
 // And update the tick hook to use the simpler version:
-
 void vApplicationTickHook(void)
 {
     static TickType_t tickCount = 0;
     tickCount++;
-    
+
     if ((tickCount % 100) == 0)
     {
         printf("[TICK] %lu ticks elapsed\n", (unsigned long)tickCount);
