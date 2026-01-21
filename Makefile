@@ -3,6 +3,7 @@ PROJECT_NAME = main
 BUILD_DIR = build
 SRC_DIR = src
 INCLUDE_DIR = include
+TRACES_DIR = traces
 
 # Chemins FreeRTOS
 FREERTOS_ROOT = C:/Users/bensi/WorkSpace_hadi/FreeRTOSv202411.00
@@ -51,7 +52,11 @@ clean:
 	@if exist $(BUILD_DIR)\*.exe del /Q $(BUILD_DIR)\*.exe
 	@if exist $(BUILD_DIR)\*.pdb del /Q $(BUILD_DIR)\*.pdb
 	@if exist $(BUILD_DIR)\*.ilk del /Q $(BUILD_DIR)\*.ilk
+	@if exist $(TRACES_DIR)\*.pdf del /Q $(TRACES_DIR)\*.pdf
+	@if exist $(TRACES_DIR)\*.png del /Q $(TRACES_DIR)\*.png
+
 	@echo Build directory cleaned!
+
 
 # Nettoyage complet
 distclean: clean

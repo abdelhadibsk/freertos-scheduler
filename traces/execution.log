@@ -1,0 +1,212 @@
+=== Execution ===
+MAIN START
+tasks created
+tasks registered
+Starting scheduler
+[IN ] Init (prio 9)
+INIT TASK START
+Applying scheduling policy 1
+Swapping 0 and 1 based on period
+Swapped 0 and 1
+No swap between 0 and 2
+End of pass 0
+Swapping 1 and 2 based on period
+Swapped 1 and 2
+End of pass 1
+Setting priority for task 0
+Set priority 8 for task 00000242C7B6C8C0
+Setting priority for task 1
+Set priority 7 for task 00000242C7B6CB60
+Setting priority for task 2
+Set priority 6 for task 00000242C7B73FD0
+INIT TASK DONE
+[OUT] Init
+[IN ] B (prio 8)
+[OUT] B
+[IN ] C (prio 7)
+[OUT] C
+[IN ] A (prio 6)
+[OUT] A
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 208
+[JOB END] Task B at 249 (exec = 40)
+[OUT] B
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 408
+[JOB END] Task B at 448 (exec = 40)
+[OUT] B
+[IN ] C (prio 7)
+[JOB START] Task C at 408
+[JOB END] Task C at 509 (exec = 60)
+[OUT] C
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 608
+[JOB END] Task B at 649 (exec = 40)
+[OUT] B
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 808
+[JOB END] Task B at 849 (exec = 40)
+[OUT] B
+[IN ] C (prio 7)
+[JOB START] Task C at 808
+[JOB END] Task C at 910 (exec = 60)
+[OUT] C
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 1008
+[JOB END] Task B at 1048 (exec = 40)
+[OUT] B
+[IN ] A (prio 6)
+[JOB START] Task A at 1008
+[JOB END] Task A at 1070 (exec = 20)
+[OUT] A
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 1208
+[JOB END] Task B at 1248 (exec = 40)
+[OUT] B
+[IN ] C (prio 7)
+[JOB START] Task C at 1208
+[JOB END] Task C at 1309 (exec = 60)
+[OUT] C
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 1408
+[JOB END] Task B at 1449 (exec = 40)
+[OUT] B
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 1608
+[JOB END] Task B at 1648 (exec = 40)
+[OUT] B
+[IN ] C (prio 7)
+[JOB START] Task C at 1608
+[JOB END] Task C at 1709 (exec = 60)
+[OUT] C
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 1808
+[JOB END] Task B at 1849 (exec = 40)
+[OUT] B
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 2008
+[JOB END] Task B at 2048 (exec = 40)
+[OUT] B
+[IN ] C (prio 7)
+[JOB START] Task C at 2008
+[JOB END] Task C at 2108 (exec = 60)
+[OUT] C
+[IN ] A (prio 6)
+[JOB START] Task A at 2008
+[JOB END] Task A at 2129 (exec = 20)
+[OUT] A
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 2208
+[JOB END] Task B at 2249 (exec = 40)
+[OUT] B
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 2408
+[JOB END] Task B at 2449 (exec = 40)
+[OUT] B
+[IN ] C (prio 7)
+[JOB START] Task C at 2408
+[JOB END] Task C at 2510 (exec = 60)
+[OUT] C
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 2608
+[JOB END] Task B at 2649 (exec = 40)
+[OUT] B
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 2808
+[JOB END] Task B at 2848 (exec = 40)
+[OUT] B
+[IN ] C (prio 7)
+[JOB START] Task C at 2808
+[JOB END] Task C at 2909 (exec = 60)
+[OUT] C
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 3008
+[JOB END] Task B at 3048 (exec = 40)
+[OUT] B
+[IN ] A (prio 6)
+[JOB START] Task A at 3008
+[JOB END] Task A at 3069 (exec = 20)
+[OUT] A
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 3208
+[JOB END] Task B at 3248 (exec = 40)
+[OUT] B
+[IN ] C (prio 7)
+[OUT] C
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 3408
+[JOB END] Task B at 3449 (exec = 40)
+[OUT] B
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 3608
+[JOB END] Task B at 3649 (exec = 40)
+[OUT] B
+[IN ] C (prio 7)
+[JOB START] Task C at 3608
+[JOB END] Task C at 3710 (exec = 60)
+[OUT] C
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 3808
+[JOB END] Task B at 3848 (exec = 40)
+[OUT] B
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 4008
+[JOB END] Task B at 4048 (exec = 40)
+[OUT] B
+[IN ] C (prio 7)
+[JOB START] Task C at 4008
+[JOB END] Task C at 4108 (exec = 60)
+[OUT] C
+[IN ] A (prio 6)
+[JOB START] Task A at 4008
+[JOB END] Task A at 4129 (exec = 20)
+[OUT] A
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
+[JOB START] Task B at 4208
+[JOB END] Task B at 4249 (exec = 40)
+[OUT] B
+[IN ] IDLE (prio 0)
+[OUT] IDLE
+[IN ] B (prio 8)
