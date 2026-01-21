@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 # =========================
 # CONFIGURATION
 # =========================
-LOG_FILE = "execution.log"
-OUTPUT_PNG = "schedule.png"
-OUTPUT_PDF = "schedule.pdf"
+LOG_FILE = "traces/execution.log"
+OUTPUT_PNG = "traces/schedule.png"
+OUTPUT_PDF = "traces/schedule.pdf"
 
 # =========================
 # REGEX PATTERNS (MATCH YOUR LOG)
-# =========================
+# ========================= 
 JOB_START_RE = re.compile(r"\[JOB START\] Task (\w+) at (\d+)")
 JOB_END_RE   = re.compile(r"\[JOB END\] Task (\w+) at (\d+)")
 
@@ -80,9 +80,9 @@ ax.grid(True)
 
 plt.tight_layout()
 plt.savefig(OUTPUT_PNG)
-plt.savefig(OUTPUT_PDF)
+#plt.savefig(OUTPUT_PDF)
 plt.show()
 
 print("\nGenerated files:")
 print(f" - {OUTPUT_PNG}")
-print(f" - {OUTPUT_PDF}")
+#print(f" - {OUTPUT_PDF}")

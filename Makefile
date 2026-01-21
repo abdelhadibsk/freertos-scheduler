@@ -1,17 +1,27 @@
+# =========================================================
 # Configuration
+# =========================================================
 PROJECT_NAME = main
 BUILD_DIR = build
 SRC_DIR = src
 INCLUDE_DIR = include
 TRACES_DIR = traces
 
-# Chemins FreeRTOS
+# Python
+PYTHON = python
+TRACE_SCRIPT = trace_to_gantt.py
+
+# =========================================================
+# FreeRTOS paths
+# =========================================================
 FREERTOS_ROOT = C:/Users/bensi/WorkSpace_hadi/FreeRTOSv202411.00
 FREERTOS_SRC = $(FREERTOS_ROOT)/FreeRTOS/Source
 FREERTOS_PORT = $(FREERTOS_SRC)/portable/MSVC-MingW
 FREERTOS_MEMMANG = $(FREERTOS_SRC)/portable/MemMang
 
-# Compilateur et flags
+# =========================================================
+# Compiler & flags
+# =========================================================
 CC = cl.exe
 CFLAGS = /nologo /Zi /EHsc /MD /Fd$(BUILD_DIR)/ /Fo$(BUILD_DIR)/
 INCLUDES = /I$(INCLUDE_DIR) \
@@ -20,8 +30,9 @@ INCLUDES = /I$(INCLUDE_DIR) \
 
 LDFLAGS = /link /machine:x64 /OUT:$(BUILD_DIR)/$(PROJECT_NAME).exe kernel32.lib winmm.lib
 
-# Fichiers source
-# Fichiers source
+# =========================================================
+# Sources
+# =========================================================
 SOURCES = $(SRC_DIR)/main.c \
           $(SRC_DIR)/scheduler.c \
           $(FREERTOS_SRC)/tasks.c \
@@ -31,45 +42,70 @@ SOURCES = $(SRC_DIR)/main.c \
           $(FREERTOS_MEMMANG)/heap_3.c \
           $(FREERTOS_PORT)/port.c
 
-
-# Cible par défaut
+# =========================================================
+# Default target
+# =========================================================
 all: $(BUILD_DIR)/$(PROJECT_NAME).exe
 
-# Compilation
+# =========================================================
+# Build
+# =========================================================
 $(BUILD_DIR)/$(PROJECT_NAME).exe: $(SOURCES)
 	@if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(INCLUDES) $(SOURCES) $(LDFLAGS)
 
-# Exécution
+# =========================================================
+# Run
+# =========================================================
 run: all
 	@echo.
 	@echo === Execution ===
 	@$(BUILD_DIR)\$(PROJECT_NAME).exe
 
-# Nettoyage
-clean:
+# =========================================================
+# Trace: run + log + python visualization
+# =========================================================
+trace: 
+	@echo tracing...
+	@$(PYTHON) traces/trace_to_gantt.py
+
+# =========================================================
+# Clean traces only
+# =========================================================
+clean-trace:
+	@if exist $(TRACES_DIR)\*.pdf del /Q $(TRACES_DIR)\*.pdf
+	@if exist $(TRACES_DIR)\*.png del /Q $(TRACES_DIR)\*.png
+	@echo Traces cleaned!
+
+# =========================================================
+# Clean build + traces
+# =========================================================
+clean: clean-trace
 	@if exist $(BUILD_DIR)\*.obj del /Q $(BUILD_DIR)\*.obj
 	@if exist $(BUILD_DIR)\*.exe del /Q $(BUILD_DIR)\*.exe
 	@if exist $(BUILD_DIR)\*.pdb del /Q $(BUILD_DIR)\*.pdb
 	@if exist $(BUILD_DIR)\*.ilk del /Q $(BUILD_DIR)\*.ilk
-	@if exist $(TRACES_DIR)\*.pdf del /Q $(TRACES_DIR)\*.pdf
-	@if exist $(TRACES_DIR)\*.png del /Q $(TRACES_DIR)\*.png
+	@echo Build cleaned!
 
-	@echo Build directory cleaned!
-
-
-# Nettoyage complet
+# =========================================================
+# Full clean
+# =========================================================
 distclean: clean
-	@if exist $(BUILD_DIR) rmdir /Q $(BUILD_DIR)
-	@echo Project cleaned completely!
+	@if exist $(BUILD_DIR) rmdir /Q /S $(BUILD_DIR)
+	@if exist $(TRACES_DIR) rmdir /Q /S $(TRACES_DIR)
+	@echo Project fully cleaned!
 
-# Aide
+# =========================================================
+# Help
+# =========================================================
 help:
-	@echo Commandes disponibles:
-	@echo   make          - Compile le projet
-	@echo   make run      - Compile et execute
-	@echo   make clean    - Nettoie les fichiers compiles
-	@echo   make distclean - Nettoie tout
-	@echo   make help     - Affiche cette aide
+	@echo Available commands:
+	@echo   make             - Compile project
+	@echo   make run         - Compile and execute
+	@echo   make trace       - Generate scheduling trace (PDF/PNG)
+	@echo   make clean       - Clean build and traces
+	@echo   make clean-trace - Clean traces only
+	@echo   make distclean   - Full cleanup
+	@echo   make help        - Show this help
 
-.PHONY: all run clean distclean help
+.PHONY: all run trace clean clean-trace distclean help

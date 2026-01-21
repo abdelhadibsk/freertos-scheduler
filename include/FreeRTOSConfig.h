@@ -6,6 +6,7 @@
 #define configUSE_PREEMPTION            1   /* IMPORTANT */
 #define configUSE_TIME_SLICING          1
 #define configRUN_MULTIPLE_PRIORITIES   1
+#define configNUMBER_OF_CORES           1
 
 
 /* ================= CPU & TICK ================= */
