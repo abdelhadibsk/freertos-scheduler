@@ -24,6 +24,7 @@ TASK_INFO_RE = re.compile(
 start_times = {}
 intervals = {}
 task_periods = {}
+time_offset = 0   # <-- NEW
 
 # =========================
 # PARSE LOG FILE
@@ -31,7 +32,7 @@ task_periods = {}
 with open(LOG_FILE, "r") as f:
     for line in f:
 
-        # -------- Extract period from header --------
+        # Extract period
         task_info = TASK_INFO_RE.search(line)
         if task_info:
             name = task_info.group(1)
@@ -39,22 +40,24 @@ with open(LOG_FILE, "r") as f:
             task_periods[name] = period
             continue
 
-        # -------- START --------
+        # START
         start_match = JOB_START_RE.search(line)
         if start_match:
             task = start_match.group(1)
             time = int(start_match.group(2))
-
-            if task in IGNORE_TASKS:
-                continue
-
             start_times[task] = time
+            continue
 
-        # -------- END --------
+        # END
         end_match = JOB_END_RE.search(line)
         if end_match:
             task = end_match.group(1)
             end_time = int(end_match.group(2))
+
+            # Capture Init end as time reference
+            if task == "Init":
+                time_offset = end_time
+                continue
 
             if task in IGNORE_TASKS:
                 continue
@@ -62,7 +65,10 @@ with open(LOG_FILE, "r") as f:
             if task not in start_times:
                 continue
 
-            start_time = start_times[task]
+            # Shift time
+            start_time = start_times[task] - time_offset
+            end_time = end_time - time_offset
+
             duration = end_time - start_time
 
             intervals.setdefault(task, []).append(
@@ -97,10 +103,9 @@ ylabels = []
 
 for task in sorted(intervals.keys()):
 
-    # Draw execution bars
     ax.broken_barh(intervals[task], (y, 0.8))
 
-    # 🔴 Draw thin red activation impulses
+    # Activation impulses (shifted)
     if task in task_periods:
         period = task_periods[task]
         activation_times = range(0, max_time + period, period)
@@ -108,8 +113,8 @@ for task in sorted(intervals.keys()):
         for t in activation_times:
             ax.vlines(
                 t,
-                y + 0.15,   # bottom of spike
-                y + 0.65,   # top of spike
+                y + 0.15,
+                y + 0.65,
                 colors='red',
                 linewidth=0.8
             )
@@ -118,11 +123,12 @@ for task in sorted(intervals.keys()):
     ylabels.append(task)
     y += 1
 
-ax.set_xlabel("Time")
+ax.set_xlim(left=0)  # Start x-axis at 0
+ax.set_xlabel("Time (after Init)")
 ax.set_ylabel("Task")
 ax.set_yticks(yticks)
 ax.set_yticklabels(ylabels)
-ax.set_title("Scheduling Timeline (RM Scheduler + Activations)")
+ax.set_title("Scheduling Timeline")
 ax.grid(True)
 
 plt.tight_layout()

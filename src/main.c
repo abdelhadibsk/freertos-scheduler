@@ -26,7 +26,7 @@ int main(void)
     sched_task_t taskA, taskB, taskC;
 
     // tasks parameters
-    taskA.period    = pdMS_TO_TICKS(100);   // Ti = 100ms
+    taskA.period    = pdMS_TO_TICKS(1000);   // Ti = 100ms
     taskA.deadline  = pdMS_TO_TICKS(100);   // Di = 100ms
     taskA.exec_time = pdMS_TO_TICKS(20);    // Ci = 20ms
     taskA.handle = tA;
