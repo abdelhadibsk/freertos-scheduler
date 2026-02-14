@@ -45,6 +45,14 @@ int main(void)
     xTaskCreate(periodic_task, "B", 1024, &taskB, 1, &tB);
     xTaskCreate(periodic_task, "C", 1024, &taskC, 1, &tC);
     printf("tasks created\n");
+    // print tasks info
+    fflush(stdout);
+
+
+    printf("Task A: period=%lu, deadline=%lu, exec_time=%lu\n", taskA.period, taskA.deadline, taskA.exec_time);
+    printf("Task B: period=%lu, deadline=%lu, exec_time=%lu\n", taskB.period, taskB.deadline, taskB.exec_time);
+    printf("Task C: period=%lu, deadline=%lu, exec_time=%lu\n", taskC.period, taskC.deadline, taskC.exec_time);
+
     fflush(stdout);
 
     scheduler_register_task(tA, taskA.period, taskA.deadline);
@@ -57,7 +65,7 @@ int main(void)
     printf("Starting scheduler\n");
     fflush(stdout);
 
-    vTaskStartScheduler();
+    vTaskStartScheduler();  // This should never return
     for (;;);
 }
 
@@ -103,9 +111,7 @@ void periodic_task(void *pvParameters)
         task->last_release = lastWakeTime;
 
         /* ===== Début du job ===== */
-        printf("[JOB START] Task %s at %lu\n",
-               pcTaskGetName(NULL),
-               (unsigned long)lastWakeTime);
+        //printf("[JOB START] Task %s at %lu\n", pcTaskGetName(NULL), (unsigned long)xTaskGetTickCount());
 
         TickType_t exec_start = xTaskGetTickCount();
 
@@ -118,10 +124,7 @@ void periodic_task(void *pvParameters)
         /* ===== Fin du job ===== */
         TickType_t finish = xTaskGetTickCount();
 
-        printf("[JOB END] Task %s at %lu (exec = %lu)\n",
-               pcTaskGetName(NULL),
-               (unsigned long)finish,
-               (unsigned long)(finish - exec_start));
+        //printf("[JOB END] Task %s at %lu (exec = %lu)\n",pcTaskGetName(NULL), (unsigned long)finish, (unsigned long)(finish - exec_start));
     }
 }
 
@@ -140,13 +143,14 @@ void MyTaskSwitchedIn(void)
 {
     TaskHandle_t h = xTaskGetCurrentTaskHandle();
 
-    printf("[IN ] %s (prio %lu)\n", pcTaskGetName(h), (unsigned long)uxTaskPriorityGet(h));
+    printf("[IN ] %s at %lu\n", pcTaskGetName(h), (unsigned long)xTaskGetTickCount());
+
 }
 
 void MyTaskSwitchedOut(void)
 {
     TaskHandle_t h = xTaskGetCurrentTaskHandle();
-    printf("[OUT] %s\n", pcTaskGetName(h));
+    printf("[OUT] %s at %lu\n", pcTaskGetName(h), (unsigned long)xTaskGetTickCount());
 }
 
 // And update the tick hook to use the simpler version:

@@ -6,18 +6,18 @@
 static sched_task_t task_table[MAX_TASKS];
 static int task_count = 0;
 
+// Task count initialization to zero   
 void scheduler_init(void)
 {
     task_count = 0;
 }
-
 
 /* Register a task with its temporal parameters */
 void scheduler_register_task(TaskHandle_t task,
                              TickType_t period,
                              TickType_t deadline)
 {
-    configASSERT(task_count < MAX_TASKS);
+    configASSERT(task_count < MAX_TASKS);   // ensure we don't exceed max tasks
 
     task_table[task_count].handle   = task;
     task_table[task_count].period   = period;
@@ -27,7 +27,6 @@ void scheduler_register_task(TaskHandle_t task,
 }
 
 // Apply scheduling policy by updating FreeRTOS priorities 
-
 void scheduler_apply_policy(sched_policy_t policy){   
     
     printf("Applying scheduling policy %d\n", policy);
@@ -69,3 +68,5 @@ void scheduler_apply_policy(sched_policy_t policy){
         printf("Set priority %llu for task %p\n", prio, (void*)task_table[i].handle);
     }
 }
+
+

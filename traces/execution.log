@@ -1,8 +1,12 @@
+=== Execution ===
 MAIN START
 tasks created
+Task A: period=100, deadline=100, exec_time=20
+Task B: period=200, deadline=200, exec_time=40
+Task C: period=400, deadline=400, exec_time=60
 tasks registered
 Starting scheduler
-[IN ] Init (prio 9)
+[IN ] Init at 0
 INIT TASK START
 Applying scheduling policy 1
 No swap between 0 and 1
@@ -11,95 +15,112 @@ End of pass 0
 No swap between 1 and 2
 End of pass 1
 Setting priority for task 0
-Set priority 8 for task 0000026047BDB680
+Set priority 8 for task 0000023F83FFB740
 Setting priority for task 1
-Set priority 7 for task 0000026047BDAF20
+Set priority 7 for task 0000023F83FFB060
 Setting priority for task 2
-Set priority 6 for task 0000026047BDB420
+Set priority 6 for task 0000023F83FFAD70
 INIT TASK DONE
-[OUT] Init
-[IN ] A (prio 8)
-[OUT] A
-[IN ] B (prio 7)
-[OUT] B
-[IN ] C (prio 6)
-[OUT] C
-[IN ] IDLE (prio 0)
-[OUT] IDLE
-[IN ] A (prio 8)
-[JOB START] Task A at 102
-[JOB END] Task A at 122 (exec = 20)
-[OUT] A
-[IN ] IDLE (prio 0)
-[OUT] IDLE
-[IN ] A (prio 8)
-[JOB START] Task A at 202
-[JOB END] Task A at 222 (exec = 20)
-[OUT] A
-[IN ] B (prio 7)
-[JOB START] Task B at 202
-[JOB END] Task B at 262 (exec = 40)
-[OUT] B
-[IN ] IDLE (prio 0)
-[OUT] IDLE
-[IN ] A (prio 8)
-[JOB START] Task A at 302
-[JOB END] Task A at 322 (exec = 20)
-[OUT] A
-[IN ] IDLE (prio 0)
-[OUT] IDLE
-[IN ] A (prio 8)
-[JOB START] Task A at 402
-[JOB END] Task A at 422 (exec = 20)
-[OUT] A
-[IN ] B (prio 7)
-[JOB START] Task B at 402
-[JOB END] Task B at 462 (exec = 40)
-[OUT] B
-[IN ] C (prio 6)
-[JOB START] Task C at 402
-[OUT] C
-[IN ] A (prio 8)
-[JOB START] Task A at 502
-[JOB END] Task A at 522 (exec = 20)
-[OUT] A
-[IN ] C (prio 6)
-[JOB END] Task C at 522 (exec = 60)
-[OUT] C
-[IN ] IDLE (prio 0)
-[OUT] IDLE
-[IN ] A (prio 8)
-[JOB START] Task A at 602
-[JOB END] Task A at 622 (exec = 20)
-[OUT] A
-[IN ] B (prio 7)
-[JOB START] Task B at 602
-[JOB END] Task B at 662 (exec = 40)
-[OUT] B
-[IN ] IDLE (prio 0)
-[OUT] IDLE
-[IN ] A (prio 8)
-[JOB START] Task A at 702
-[JOB END] Task A at 722 (exec = 20)
-[OUT] A
-[IN ] IDLE (prio 0)
-[OUT] IDLE
-[IN ] A (prio 8)
-[JOB START] Task A at 802
-[JOB END] Task A at 822 (exec = 20)
-[OUT] A
-[IN ] B (prio 7)
-[JOB START] Task B at 802
-[JOB END] Task B at 862 (exec = 40)
-[OUT] B
-[IN ] C (prio 6)
-[JOB START] Task C at 802
-[OUT] C
-[IN ] A (prio 8)
-[JOB START] Task A at 902
-[JOB END] Task A at 922 (exec = 20)
-[OUT] A
-[IN ] C (prio 6)
-[JOB END] Task C at 922 (exec = 60)
-[OUT] C
-[IN ] IDLE (prio 0)
+[OUT] Init at 6
+[IN ] A at 6
+[OUT] A at 6
+[IN ] B at 6
+[OUT] B at 7
+[IN ] C at 7
+[OUT] C at 7
+[IN ] IDLE at 7
+[OUT] IDLE at 106
+[IN ] A at 106
+[OUT] A at 126
+[IN ] IDLE at 126
+[OUT] IDLE at 206
+[IN ] A at 206
+[OUT] A at 226
+[IN ] B at 226
+[OUT] B at 266
+[IN ] IDLE at 266
+[OUT] IDLE at 306
+[IN ] A at 306
+[OUT] A at 326
+[IN ] IDLE at 326
+[OUT] IDLE at 406
+[IN ] A at 406
+[OUT] A at 427
+[IN ] B at 427
+[OUT] B at 467
+[IN ] C at 467
+[OUT] C at 506
+[IN ] A at 506
+[OUT] A at 526
+[IN ] C at 526
+[OUT] C at 527
+[IN ] IDLE at 527
+[OUT] IDLE at 606
+[IN ] A at 606
+[OUT] A at 626
+[IN ] B at 626
+[OUT] B at 666
+[IN ] IDLE at 666
+[OUT] IDLE at 706
+[IN ] A at 706
+[OUT] A at 726
+[IN ] IDLE at 726
+[OUT] IDLE at 806
+[IN ] A at 806
+[OUT] A at 826
+[IN ] B at 826
+[OUT] B at 866
+[IN ] C at 866
+[OUT] C at 906
+[IN ] A at 906
+[OUT] A at 926
+[IN ] C at 926
+[OUT] C at 927
+[IN ] IDLE at 927
+[OUT] IDLE at 1006
+[IN ] A at 1006
+[OUT] A at 1026
+[IN ] B at 1026
+[OUT] B at 1066
+[IN ] IDLE at 1066
+[OUT] IDLE at 1106
+[IN ] A at 1106
+[OUT] A at 1126
+[IN ] IDLE at 1126
+[OUT] IDLE at 1206
+[IN ] A at 1206
+[OUT] A at 1226
+[IN ] B at 1226
+[OUT] B at 1266
+[IN ] C at 1266
+[OUT] C at 1306
+[IN ] A at 1306
+[OUT] A at 1326
+[IN ] C at 1326
+[OUT] C at 1326
+[IN ] IDLE at 1326
+[OUT] IDLE at 1406
+[IN ] A at 1406
+[OUT] A at 1426
+[IN ] B at 1426
+[OUT] B at 1466
+[IN ] IDLE at 1466
+[OUT] IDLE at 1506
+[IN ] A at 1506
+[OUT] A at 1526
+[IN ] IDLE at 1526
+[OUT] IDLE at 1606
+[IN ] A at 1606
+[OUT] A at 1626
+[IN ] B at 1626
+[OUT] B at 1667
+[IN ] C at 1667
+[OUT] C at 1706
+[IN ] A at 1706
+[OUT] A at 1726
+[IN ] C at 1726
+[OUT] C at 1727
+[IN ] IDLE at 1727
+[OUT] IDLE at 1806
+[IN ] A at 1806
+[OUT] A at 1826
