@@ -39,7 +39,7 @@ SOURCES = $(SRC_DIR)/main.c \
           $(FREERTOS_SRC)/queue.c \
           $(FREERTOS_SRC)/timers.c \
           $(FREERTOS_SRC)/list.c \
-          $(FREERTOS_MEMMANG)/heap_3.c \
+          $(FREERTOS_MEMMANG)/heap_1.c \
           $(FREERTOS_PORT)/port.c
 
 # =========================================================

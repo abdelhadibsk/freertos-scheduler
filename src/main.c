@@ -15,6 +15,14 @@ void MyTaskSwitchedOut(void);
 
 TaskHandle_t tA, tB, tC, tD;
 
+// changing heap_3.c to heap_1.c causes malloc to fail and tasks not to be created, which is expected since heap_1 does not support freeing memory and we are creating multiple tasks that require dynamic allocation.
+// using static allocation for tasks (configSUPPORT_STATIC_ALLOCATION) allows us to create tasks without relying on the heap, which is why it works even with heap_1.c. However, we need to ensure that we provide the necessary static buffers for the task control blocks and stacks when using static allocation.
+
+static StaticTask_t xTaskTCB1, xTaskTCB2, xTaskTCB3;
+static StackType_t xStack1[ configMINIMAL_STACK_SIZE ];
+static StackType_t xStack2[ configMINIMAL_STACK_SIZE ];
+static StackType_t xStack3[ configMINIMAL_STACK_SIZE ];
+
 int main(void)
 {   
     printf("MAIN START\n");
@@ -26,7 +34,7 @@ int main(void)
     sched_task_t taskA, taskB, taskC;
 
     // tasks parameters
-    taskA.period    = pdMS_TO_TICKS(1000);   // Ti = 100ms
+    taskA.period    = pdMS_TO_TICKS(100);   // Ti = 100ms
     taskA.deadline  = pdMS_TO_TICKS(100);   // Di = 100ms
     taskA.exec_time = pdMS_TO_TICKS(20);    // Ci = 20ms
     taskA.handle = tA;
@@ -41,10 +49,16 @@ int main(void)
     taskC.exec_time = pdMS_TO_TICKS(60);
     taskC.handle = tC;
 
-    xTaskCreate(periodic_task, "A", 1024, &taskA, 1, &tA); 
-    xTaskCreate(periodic_task, "B", 1024, &taskB, 1, &tB);
-    xTaskCreate(periodic_task, "C", 1024, &taskC, 1, &tC);
+    
+    tA = xTaskCreateStatic(periodic_task, "A", 1024, &taskA, 1, xStack1, &xTaskTCB1); 
+    tB = xTaskCreateStatic(periodic_task, "B", 1024, &taskB, 1, xStack2, &xTaskTCB2);
+    tC = xTaskCreateStatic(periodic_task, "C", 1024, &taskC, 1, xStack3, &xTaskTCB3);
     printf("tasks created\n");
+    
+    vTaskSuspend(tA);
+    vTaskSuspend(tB);
+    vTaskSuspend(tC);
+    
     // print tasks info
     fflush(stdout);
 
@@ -61,7 +75,7 @@ int main(void)
     printf("tasks registered\n");
     fflush(stdout);
 
-    xTaskCreate(init_task, "Init", 1024, NULL, configSCHEDULER_PRIORITY, NULL);
+    TaskHandle_t tInit = xTaskCreateStatic(init_task, "Init", 1024, NULL, configSCHEDULER_PRIORITY, xStack1, &xTaskTCB1);
     printf("Starting scheduler\n");
     fflush(stdout);
 
@@ -72,6 +86,7 @@ int main(void)
 void init_task(void *p)
 {
     printf("INIT TASK START\n");
+    fflush(stdout);
 
     // Choose scheduling policy 
     // scheduler_apply_policy(SCHED_RM);
@@ -79,9 +94,15 @@ void init_task(void *p)
     // scheduler_apply_policy(SCHED_FIFO);
 
     scheduler_apply_policy(SCHED_RM);
+    vTaskResume(tA);
+    vTaskResume(tB);    
+    vTaskResume(tC);
 
     printf("INIT TASK DONE\n");
-    vTaskDelete(NULL);
+    fflush(stdout);
+    // vTaskDelete(NULL);
+    // vTaskPrioritySet(NULL, 0); // lower priority to let other tasks run
+    vTaskSuspend(NULL); // suspend itself
     
 }
 
