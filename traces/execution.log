@@ -1,7 +1,7 @@
 === Execution ===
 MAIN START
 tasks created
-Task A: period=1000, deadline=100, exec_time=20
+Task A: period=100, deadline=100, exec_time=20
 Task B: period=200, deadline=200, exec_time=40
 Task C: period=400, deadline=400, exec_time=60
 tasks registered
@@ -9,206 +9,124 @@ Starting scheduler
 [IN ] Init at 0
 INIT TASK START
 Applying scheduling policy 1
-Swapping 0 and 1 based on period
-Swapped 0 and 1
+No swap between 0 and 1
 No swap between 0 and 2
 End of pass 0
-Swapping 1 and 2 based on period
-Swapped 1 and 2
+No swap between 1 and 2
 End of pass 1
 Setting priority for task 0
-Set priority 8 for task 0000018A97F9AD40
+Set priority 8 for task 0000010D3A4D9FD0
 Setting priority for task 1
-Set priority 7 for task 0000018A97F9AF70
+Set priority 7 for task 0000010D3A4D73D0
 Setting priority for task 2
-Set priority 6 for task 0000018A97F9BEA0
+Set priority 6 for task 0000010D3A4DB030
 INIT TASK DONE
-[OUT] Init at 5
-[IN ] B at 5
-[OUT] B at 5
-[IN ] C at 5
-[OUT] C at 5
-[IN ] A at 5
-[OUT] A at 6
-[IN ] IDLE at 6
-[OUT] IDLE at 205
-[IN ] B at 205
-[OUT] B at 246
-[IN ] IDLE at 246
-[OUT] IDLE at 405
-[IN ] B at 405
-[OUT] B at 445
-[IN ] C at 445
-[OUT] C at 505
-[IN ] IDLE at 505
-[OUT] IDLE at 605
-[IN ] B at 605
-[OUT] B at 645
-[IN ] IDLE at 645
-[OUT] IDLE at 805
-[IN ] B at 805
-[OUT] B at 845
-[IN ] C at 845
-[OUT] C at 905
-[IN ] IDLE at 905
-[OUT] IDLE at 1005
-[IN ] B at 1005
-[OUT] B at 1045
-[IN ] A at 1045
-[OUT] A at 1065
-[IN ] IDLE at 1065
-[OUT] IDLE at 1205
-[IN ] B at 1205
-[OUT] B at 1245
-[IN ] C at 1245
-[OUT] C at 1305
-[IN ] IDLE at 1305
-[OUT] IDLE at 1405
-[IN ] B at 1405
-[OUT] B at 1446
-[IN ] IDLE at 1446
-[OUT] IDLE at 1605
-[IN ] B at 1605
-[OUT] B at 1645
-[IN ] C at 1645
-[OUT] C at 1706
-[IN ] IDLE at 1706
-[OUT] IDLE at 1805
-[IN ] B at 1805
-[OUT] B at 1845
-[IN ] IDLE at 1845
-[OUT] IDLE at 2005
-[IN ] B at 2005
-[OUT] B at 2046
-[IN ] C at 2046
-[OUT] C at 2106
-[IN ] A at 2106
-[OUT] A at 2126
-[IN ] IDLE at 2126
-[OUT] IDLE at 2205
-[IN ] B at 2205
-[OUT] B at 2245
-[IN ] IDLE at 2245
-[OUT] IDLE at 2405
-[IN ] B at 2405
-[OUT] B at 2445
-[IN ] C at 2445
-[OUT] C at 2505
-[IN ] IDLE at 2505
-[OUT] IDLE at 2605
-[IN ] B at 2605
-[OUT] B at 2645
-[IN ] IDLE at 2645
-[OUT] IDLE at 2805
-[IN ] B at 2805
-[OUT] B at 2845
-[IN ] C at 2845
-[OUT] C at 2905
-[IN ] IDLE at 2905
-[OUT] IDLE at 3005
-[IN ] B at 3005
-[OUT] B at 3045
-[IN ] A at 3045
-[OUT] A at 3065
-[IN ] IDLE at 3065
-[OUT] IDLE at 3205
-[IN ] B at 3205
-[OUT] B at 3245
-[IN ] C at 3245
-[OUT] C at 3305
-[IN ] IDLE at 3305
-[OUT] IDLE at 3405
-[IN ] B at 3405
-[OUT] B at 3445
-[IN ] IDLE at 3445
-[OUT] IDLE at 3605
-[IN ] B at 3605
-[OUT] B at 3645
-[IN ] C at 3645
-[OUT] C at 3705
-[IN ] IDLE at 3705
-[OUT] IDLE at 3805
-[IN ] B at 3805
-[OUT] B at 3845
-[IN ] IDLE at 3845
-[OUT] IDLE at 4005
-[IN ] B at 4005
-[OUT] B at 4045
-[IN ] C at 4045
-[OUT] C at 4105
-[IN ] A at 4105
-[OUT] A at 4125
-[IN ] IDLE at 4125
-[OUT] IDLE at 4205
-[IN ] B at 4205
-[OUT] B at 4245
-[IN ] IDLE at 4245
-[OUT] IDLE at 4405
-[IN ] B at 4405
-[OUT] B at 4445
-[IN ] C at 4445
-[OUT] C at 4506
-[IN ] IDLE at 4506
-[OUT] IDLE at 4605
-[IN ] B at 4605
-[OUT] B at 4645
-[IN ] IDLE at 4645
-[OUT] IDLE at 4805
-[IN ] B at 4805
-[OUT] B at 4845
-[IN ] C at 4845
-[OUT] C at 4905
-[IN ] IDLE at 4905
-[OUT] IDLE at 5005
-[IN ] B at 5005
-[OUT] B at 5045
-[IN ] A at 5045
-[OUT] A at 5065
-[IN ] IDLE at 5065
-[OUT] IDLE at 5205
-[IN ] B at 5205
-[OUT] B at 5245
-[IN ] C at 5245
-[OUT] C at 5306
-[IN ] IDLE at 5306
-[OUT] IDLE at 5405
-[IN ] B at 5405
-[OUT] B at 5445
-[IN ] IDLE at 5445
-[OUT] IDLE at 5605
-[IN ] B at 5605
-[OUT] B at 5645
-[IN ] C at 5645
-[OUT] C at 5705
-[IN ] IDLE at 5705
-[OUT] IDLE at 5805
-[IN ] B at 5805
-[OUT] B at 5845
-[IN ] IDLE at 5845
-[OUT] IDLE at 6005
-[IN ] B at 6005
-[OUT] B at 6045
-[IN ] C at 6045
-[OUT] C at 6105
-[IN ] A at 6105
-[OUT] A at 6125
-[IN ] IDLE at 6125
-[OUT] IDLE at 6205
-[IN ] B at 6205
-[OUT] B at 6245
-[IN ] IDLE at 6245
-[OUT] IDLE at 6405
-[IN ] B at 6405
-[OUT] B at 6446
-[IN ] C at 6446
-[OUT] C at 6506
-[IN ] IDLE at 6506
-[OUT] IDLE at 6605
-[IN ] B at 6605
-[OUT] B at 6645
-[IN ] IDLE at 6645
-[OUT] IDLE at 6805
-[IN ] B at 6805
-[OUT] B at 6845
-[IN ] C at 6845
-[OUT] C at 6905
+[OUT] Init at 9
+[IN ] A at 9
+[OUT] A at 9
+[IN ] B at 9
+[OUT] B at 9
+[IN ] C at 9
+[OUT] C at 10
+[IN ] IDLE at 10
+[OUT] IDLE at 109
+[IN ] A at 109
+[OUT] A at 130
+[IN ] IDLE at 130
+[OUT] IDLE at 209
+[IN ] A at 209
+[OUT] A at 229
+[IN ] B at 229
+[OUT] B at 269
+[IN ] IDLE at 269
+[OUT] IDLE at 309
+[IN ] A at 309
+[OUT] A at 329
+[IN ] IDLE at 329
+[OUT] IDLE at 409
+[IN ] A at 409
+[OUT] A at 429
+[IN ] B at 429
+[OUT] B at 469
+[IN ] C at 469
+[OUT] C at 509
+[IN ] A at 509
+[OUT] A at 529
+[IN ] C at 529
+[OUT] C at 529
+[IN ] IDLE at 529
+[OUT] IDLE at 609
+[IN ] A at 609
+[OUT] A at 629
+[IN ] B at 629
+[OUT] B at 669
+[IN ] IDLE at 669
+[OUT] IDLE at 709
+[IN ] A at 709
+[OUT] A at 729
+[IN ] IDLE at 729
+[OUT] IDLE at 809
+[IN ] A at 809
+[OUT] A at 829
+[IN ] B at 829
+[OUT] B at 869
+[IN ] C at 869
+[OUT] C at 909
+[IN ] A at 909
+[OUT] A at 929
+[IN ] C at 929
+[OUT] C at 929
+[IN ] IDLE at 929
+[OUT] IDLE at 1009
+[IN ] A at 1009
+[OUT] A at 1029
+[IN ] B at 1029
+[OUT] B at 1069
+[IN ] IDLE at 1069
+[OUT] IDLE at 1109
+[IN ] A at 1109
+[OUT] A at 1129
+[IN ] IDLE at 1129
+[OUT] IDLE at 1209
+[IN ] A at 1209
+[OUT] A at 1229
+[IN ] B at 1229
+[OUT] B at 1269
+[IN ] C at 1269
+[OUT] C at 1309
+[IN ] A at 1309
+[OUT] A at 1329
+[IN ] C at 1329
+[OUT] C at 1329
+[IN ] IDLE at 1329
+[OUT] IDLE at 1409
+[IN ] A at 1409
+[OUT] A at 1429
+[IN ] B at 1429
+[OUT] B at 1469
+[IN ] IDLE at 1469
+[OUT] IDLE at 1509
+[IN ] A at 1509
+[OUT] A at 1529
+[IN ] IDLE at 1529
+[OUT] IDLE at 1609
+[IN ] A at 1609
+[OUT] A at 1629
+[IN ] B at 1629
+[OUT] B at 1669
+[IN ] C at 1669
+[OUT] C at 1709
+[IN ] A at 1709
+[OUT] A at 1729
+[IN ] C at 1729
+[OUT] C at 1729
+[IN ] IDLE at 1729
+[OUT] IDLE at 1809
+[IN ] A at 1809
+[OUT] A at 1829
+[IN ] B at 1829
+[OUT] B at 1869
+[IN ] IDLE at 1869
+[OUT] IDLE at 1909
+[IN ] A at 1909
+[OUT] A at 1930
