@@ -15,118 +15,112 @@ End of pass 0
 No swap between 1 and 2
 End of pass 1
 Setting priority for task 0
-Set priority 8 for task 0000010D3A4D9FD0
+Set priority 8 for task 000002A43CFBB790
 Setting priority for task 1
-Set priority 7 for task 0000010D3A4D73D0
+Set priority 7 for task 000002A43CFBB060
 Setting priority for task 2
-Set priority 6 for task 0000010D3A4DB030
+Set priority 6 for task 000002A43CFBB4D0
 INIT TASK DONE
-[OUT] Init at 9
-[IN ] A at 9
-[OUT] A at 9
-[IN ] B at 9
-[OUT] B at 9
-[IN ] C at 9
-[OUT] C at 10
-[IN ] IDLE at 10
-[OUT] IDLE at 109
-[IN ] A at 109
-[OUT] A at 130
-[IN ] IDLE at 130
-[OUT] IDLE at 209
-[IN ] A at 209
-[OUT] A at 229
-[IN ] B at 229
-[OUT] B at 269
-[IN ] IDLE at 269
-[OUT] IDLE at 309
-[IN ] A at 309
-[OUT] A at 329
-[IN ] IDLE at 329
-[OUT] IDLE at 409
-[IN ] A at 409
-[OUT] A at 429
-[IN ] B at 429
-[OUT] B at 469
-[IN ] C at 469
-[OUT] C at 509
-[IN ] A at 509
-[OUT] A at 529
-[IN ] C at 529
-[OUT] C at 529
-[IN ] IDLE at 529
-[OUT] IDLE at 609
-[IN ] A at 609
-[OUT] A at 629
-[IN ] B at 629
-[OUT] B at 669
-[IN ] IDLE at 669
-[OUT] IDLE at 709
-[IN ] A at 709
-[OUT] A at 729
-[IN ] IDLE at 729
-[OUT] IDLE at 809
-[IN ] A at 809
-[OUT] A at 829
-[IN ] B at 829
-[OUT] B at 869
-[IN ] C at 869
-[OUT] C at 909
-[IN ] A at 909
-[OUT] A at 929
-[IN ] C at 929
-[OUT] C at 929
-[IN ] IDLE at 929
-[OUT] IDLE at 1009
-[IN ] A at 1009
-[OUT] A at 1029
-[IN ] B at 1029
-[OUT] B at 1069
-[IN ] IDLE at 1069
-[OUT] IDLE at 1109
-[IN ] A at 1109
-[OUT] A at 1129
-[IN ] IDLE at 1129
-[OUT] IDLE at 1209
-[IN ] A at 1209
-[OUT] A at 1229
-[IN ] B at 1229
-[OUT] B at 1269
-[IN ] C at 1269
-[OUT] C at 1309
-[IN ] A at 1309
-[OUT] A at 1329
-[IN ] C at 1329
-[OUT] C at 1329
-[IN ] IDLE at 1329
-[OUT] IDLE at 1409
-[IN ] A at 1409
-[OUT] A at 1429
-[IN ] B at 1429
-[OUT] B at 1469
-[IN ] IDLE at 1469
-[OUT] IDLE at 1509
-[IN ] A at 1509
-[OUT] A at 1529
-[IN ] IDLE at 1529
-[OUT] IDLE at 1609
-[IN ] A at 1609
-[OUT] A at 1629
-[IN ] B at 1629
-[OUT] B at 1669
-[IN ] C at 1669
-[OUT] C at 1709
-[IN ] A at 1709
-[OUT] A at 1729
-[IN ] C at 1729
-[OUT] C at 1729
-[IN ] IDLE at 1729
-[OUT] IDLE at 1809
-[IN ] A at 1809
-[OUT] A at 1829
-[IN ] B at 1829
-[OUT] B at 1869
-[IN ] IDLE at 1869
-[OUT] IDLE at 1909
-[IN ] A at 1909
-[OUT] A at 1930
+[OUT] Init at 6
+[IN ] A at 6
+[OUT] A at 6
+[IN ] B at 6
+[OUT] B at 6
+[IN ] C at 6
+[OUT] C at 7
+[IN ] IDLE at 7
+[OUT] IDLE at 106
+[IN ] A at 106
+[OUT] A at 126
+[IN ] IDLE at 126
+[OUT] IDLE at 206
+[IN ] A at 206
+[OUT] A at 226
+[IN ] B at 226
+[OUT] B at 267
+[IN ] IDLE at 267
+[OUT] IDLE at 306
+[IN ] A at 306
+[OUT] A at 326
+[IN ] IDLE at 326
+[OUT] IDLE at 406
+[IN ] A at 406
+[OUT] A at 426
+[IN ] B at 426
+[OUT] B at 466
+[IN ] C at 466
+[OUT] C at 506
+[IN ] A at 506
+[OUT] A at 526
+[IN ] C at 526
+[OUT] C at 526
+[IN ] IDLE at 526
+[OUT] IDLE at 606
+[IN ] A at 606
+[OUT] A at 626
+[IN ] B at 626
+[OUT] B at 666
+[IN ] IDLE at 666
+[OUT] IDLE at 706
+[IN ] A at 706
+[OUT] A at 726
+[IN ] IDLE at 726
+[OUT] IDLE at 806
+[IN ] A at 806
+[OUT] A at 826
+[IN ] B at 826
+[OUT] B at 867
+[IN ] C at 867
+[OUT] C at 906
+[IN ] A at 906
+[OUT] A at 926
+[IN ] C at 926
+[OUT] C at 928
+[IN ] IDLE at 928
+[OUT] IDLE at 1006
+[IN ] A at 1006
+[OUT] A at 1026
+[IN ] B at 1026
+[OUT] B at 1066
+[IN ] IDLE at 1066
+[OUT] IDLE at 1106
+[IN ] A at 1106
+[OUT] A at 1126
+[IN ] IDLE at 1126
+[OUT] IDLE at 1206
+[IN ] A at 1206
+[OUT] A at 1226
+[IN ] B at 1226
+[OUT] B at 1266
+[IN ] C at 1266
+[OUT] C at 1306
+[IN ] A at 1306
+[OUT] A at 1327
+[IN ] C at 1327
+[OUT] C at 1327
+[IN ] IDLE at 1327
+[OUT] IDLE at 1406
+[IN ] A at 1406
+[OUT] A at 1426
+[IN ] B at 1426
+[OUT] B at 1466
+[IN ] IDLE at 1466
+[OUT] IDLE at 1506
+[IN ] A at 1506
+[OUT] A at 1526
+[IN ] IDLE at 1526
+[OUT] IDLE at 1606
+[IN ] A at 1606
+[OUT] A at 1626
+[IN ] B at 1626
+[OUT] B at 1666
+[IN ] C at 1666
+[OUT] C at 1706
+[IN ] A at 1706
+[OUT] A at 1726
+[IN ] C at 1726
+[OUT] C at 1726
+[IN ] IDLE at 1726
+[OUT] IDLE at 1806
+[IN ] A at 1806
+[OUT] A at 1827

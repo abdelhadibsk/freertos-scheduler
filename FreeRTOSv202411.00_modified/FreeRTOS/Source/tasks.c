@@ -371,6 +371,17 @@ typedef struct tskTaskControlBlock       /* The old naming convention is used to
     ListItem_t xEventListItem;                  /**< Used to reference a task from an event list. */
     UBaseType_t uxPriority;                     /**< The priority of the task.  0 is the lowest priority. */
     StackType_t * pxStack;                      /**< Points to the start of the stack. */
+
+    //we should myb add new tasks parameters here, such as period, deadline, execution time, etc. for EDF scheduling
+    TickType_t period;                         /**< The period of the task. */
+    TickType_t deadline;                       /**< The relative deadline of the task. */
+    TickType_t exec_time;                     /**< The execution time of the task. */
+    TickType_t remaining_exec_time;            /**< The remaining execution time of the task. */
+    TickType_t absolute_deadline;              /**< The absolute deadline of the task. */
+    
+    
+    // We can also add other parameters such as remaining execution time, absolute deadline, etc. if needed for the scheduling algorithm.
+
     #if ( configNUMBER_OF_CORES > 1 )
         volatile BaseType_t xTaskRunState;      /**< Used to identify the core the task is running on, if the task is running. Otherwise, identifies the task's state - not running or yielding. */
         UBaseType_t uxTaskAttributes;           /**< Task's attributes - currently used to identify the idle tasks. */
