@@ -8,6 +8,13 @@
 #define configRUN_MULTIPLE_PRIORITIES   1
 #define configNUMBER_OF_CORES           1
 
+/* ================= Scheduling algorithms ================= */
+#define FIFO_AlGORITHM      0
+#define RM_ALGORITHM        0
+#define DM_ALGORITHM        0
+
+/* periodique tasks */
+#define configUSE_PERIODIC_TASKS              1   // to enable regestering the parameters of periodic tasks in scheduler_register_task
 
 /* ================= CPU & TICK ================= */
 

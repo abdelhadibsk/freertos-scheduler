@@ -29,6 +29,7 @@
 /* Standard includes. */
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
  * all the API functions to use the MPU wrappers.  That should only be done when
@@ -372,13 +373,16 @@ typedef struct tskTaskControlBlock       /* The old naming convention is used to
     UBaseType_t uxPriority;                     /**< The priority of the task.  0 is the lowest priority. */
     StackType_t * pxStack;                      /**< Points to the start of the stack. */
 
-    //we should myb add new tasks parameters here, such as period, deadline, execution time, etc. for EDF scheduling
-    TickType_t period;                         /**< The period of the task. */
-    TickType_t deadline;                       /**< The relative deadline of the task. */
-    TickType_t exec_time;                     /**< The execution time of the task. */
-    TickType_t remaining_exec_time;            /**< The remaining execution time of the task. */
-    TickType_t absolute_deadline;              /**< The absolute deadline of the task. */
-    
+    #if ( configUSE_PERIODIC_TASKS == 1 )
+
+        //we should myb add new tasks parameters here, such as period, deadline, execution time, etc. for EDF scheduling
+        TickType_t period;                         /**< The period of the task. */
+        TickType_t deadline;                       /**< The relative deadline of the task. */
+        TickType_t exec_time;                     /**< The execution time of the task. */
+        TickType_t remaining_exec_time;            /**< The remaining execution time of the task. */
+        TickType_t absolute_deadline;              /**< The absolute deadline of the task. */
+
+    #endif /* configUSE_PERIODIC_TASKS == 1 */
     
     // We can also add other parameters such as remaining execution time, absolute deadline, etc. if needed for the scheduling algorithm.
 
@@ -1736,7 +1740,13 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB ) PRIVILEGED_FUNCTION;
         TCB_t * pxNewTCB;
         BaseType_t xReturn;
 
+        // let's suppose we have a function that calculates the priority of a task, it has as input the list of tasks and their priorities, and it returns the priority
+        // UBaseType_t Priority_calculator(TaskFunction_t pxTaskCode, 
+        // uxPriority = 
+
         traceENTER_xTaskCreate( pxTaskCode, pcName, uxStackDepth, pvParameters, uxPriority, pxCreatedTask );
+        
+        printf("hi from xTaskCreate\n");    // to know that we are using the modified version of FreeRTOS
 
         pxNewTCB = prvCreateTask( pxTaskCode, pcName, uxStackDepth, pvParameters, uxPriority, pxCreatedTask );
 
@@ -1910,6 +1920,16 @@ static void prvInitialiseNewTask( TaskFunction_t pxTaskCode,
     {
         mtCOVERAGE_TEST_MARKER();
     }
+
+    //here we can write the characteristics of the task in the TCB
+    // int in
+    // pxNewTCB->period = period_task[index];
+    // pxNewTCB->execution_time = execution_time_task[index];
+    // pxNewTCB->deadline = deadline_task[index];
+    
+
+    // here we can add a function that calculates the priority of the task based on the list of tasks and their parameters, and the task function itself. For example, we can have a function that takes as input the list of tasks and their priorities, and the task function, and returns the priority of the task. This function can be called before setting the priority of the task, and it can be used to set the priority of the task based on its parameters like periode, execution time, deadline, etc. This way we can have a more dynamic priority assignment based on the task's characteristics.
+    // uxPriority = Priority_calculator(pxTaskCode, ...);
 
     pxNewTCB->uxPriority = uxPriority;
     #if ( configUSE_MUTEXES == 1 )

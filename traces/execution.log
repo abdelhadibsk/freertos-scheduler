@@ -1,11 +1,16 @@
 === Execution ===
 MAIN START
+hi from xTaskCreate
+hi from xTaskCreate
+hi from xTaskCreate
 tasks created
 Task A: period=100, deadline=100, exec_time=20
 Task B: period=200, deadline=200, exec_time=40
 Task C: period=400, deadline=400, exec_time=60
 tasks registered
+hi from xTaskCreate
 Starting scheduler
+hi from xTaskCreate
 [IN ] Init at 0
 INIT TASK START
 Applying scheduling policy 1
@@ -15,112 +20,122 @@ End of pass 0
 No swap between 1 and 2
 End of pass 1
 Setting priority for task 0
-Set priority 8 for task 000002A43CFBB790
+Set priority 8 for task 000001CD2F1CBEA0
 Setting priority for task 1
-Set priority 7 for task 000002A43CFBB060
+Set priority 7 for task 000001CD2F1CB060
 Setting priority for task 2
-Set priority 6 for task 000002A43CFBB4D0
+Set priority 6 for task 000001CD2F1CAEA0
 INIT TASK DONE
-[OUT] Init at 6
-[IN ] A at 6
-[OUT] A at 6
-[IN ] B at 6
-[OUT] B at 6
-[IN ] C at 6
-[OUT] C at 7
-[IN ] IDLE at 7
-[OUT] IDLE at 106
-[IN ] A at 106
-[OUT] A at 126
-[IN ] IDLE at 126
-[OUT] IDLE at 206
-[IN ] A at 206
-[OUT] A at 226
-[IN ] B at 226
-[OUT] B at 267
-[IN ] IDLE at 267
-[OUT] IDLE at 306
-[IN ] A at 306
-[OUT] A at 326
-[IN ] IDLE at 326
-[OUT] IDLE at 406
-[IN ] A at 406
-[OUT] A at 426
-[IN ] B at 426
-[OUT] B at 466
-[IN ] C at 466
-[OUT] C at 506
-[IN ] A at 506
-[OUT] A at 526
-[IN ] C at 526
-[OUT] C at 526
-[IN ] IDLE at 526
-[OUT] IDLE at 606
-[IN ] A at 606
-[OUT] A at 626
-[IN ] B at 626
-[OUT] B at 666
-[IN ] IDLE at 666
-[OUT] IDLE at 706
-[IN ] A at 706
-[OUT] A at 726
-[IN ] IDLE at 726
-[OUT] IDLE at 806
-[IN ] A at 806
-[OUT] A at 826
-[IN ] B at 826
-[OUT] B at 867
-[IN ] C at 867
-[OUT] C at 906
-[IN ] A at 906
-[OUT] A at 926
-[IN ] C at 926
-[OUT] C at 928
-[IN ] IDLE at 928
-[OUT] IDLE at 1006
-[IN ] A at 1006
-[OUT] A at 1026
-[IN ] B at 1026
-[OUT] B at 1066
-[IN ] IDLE at 1066
-[OUT] IDLE at 1106
-[IN ] A at 1106
-[OUT] A at 1126
-[IN ] IDLE at 1126
-[OUT] IDLE at 1206
-[IN ] A at 1206
-[OUT] A at 1226
-[IN ] B at 1226
+[OUT] Init at 5
+[IN ] A at 5
+[OUT] A at 5
+[IN ] B at 5
+[OUT] B at 5
+[IN ] C at 5
+[OUT] C at 5
+[IN ] IDLE at 5
+[OUT] IDLE at 105
+[IN ] A at 105
+[OUT] A at 125
+[IN ] IDLE at 125
+[OUT] IDLE at 205
+[IN ] A at 205
+[OUT] A at 225
+[IN ] B at 225
+[OUT] B at 265
+[IN ] IDLE at 265
+[OUT] IDLE at 305
+[IN ] A at 305
+[OUT] A at 325
+[IN ] IDLE at 325
+[OUT] IDLE at 405
+[IN ] A at 405
+[OUT] A at 425
+[IN ] B at 425
+[OUT] B at 465
+[IN ] C at 465
+[OUT] C at 505
+[IN ] A at 505
+[OUT] A at 525
+[IN ] C at 525
+[OUT] C at 525
+[IN ] IDLE at 525
+[OUT] IDLE at 605
+[IN ] A at 605
+[OUT] A at 625
+[IN ] B at 625
+[OUT] B at 665
+[IN ] IDLE at 665
+[OUT] IDLE at 705
+[IN ] A at 705
+[OUT] A at 725
+[IN ] IDLE at 725
+[OUT] IDLE at 805
+[IN ] A at 805
+[OUT] A at 825
+[IN ] B at 825
+[OUT] B at 865
+[IN ] C at 865
+[OUT] C at 905
+[IN ] A at 905
+[OUT] A at 925
+[IN ] C at 925
+[OUT] C at 925
+[IN ] IDLE at 925
+[OUT] IDLE at 1005
+[IN ] A at 1005
+[OUT] A at 1025
+[IN ] B at 1025
+[OUT] B at 1065
+[IN ] IDLE at 1065
+[OUT] IDLE at 1105
+[IN ] A at 1105
+[OUT] A at 1125
+[IN ] IDLE at 1125
+[OUT] IDLE at 1205
+[IN ] A at 1205
+[OUT] A at 1225
+[IN ] B at 1225
 [OUT] B at 1266
 [IN ] C at 1266
-[OUT] C at 1306
-[IN ] A at 1306
-[OUT] A at 1327
-[IN ] C at 1327
-[OUT] C at 1327
-[IN ] IDLE at 1327
-[OUT] IDLE at 1406
-[IN ] A at 1406
-[OUT] A at 1426
-[IN ] B at 1426
+[OUT] C at 1305
+[IN ] A at 1305
+[OUT] A at 1325
+[IN ] C at 1325
+[OUT] C at 1326
+[IN ] IDLE at 1326
+[OUT] IDLE at 1405
+[IN ] A at 1405
+[OUT] A at 1425
+[IN ] B at 1425
 [OUT] B at 1466
 [IN ] IDLE at 1466
-[OUT] IDLE at 1506
-[IN ] A at 1506
+[OUT] IDLE at 1505
+[IN ] A at 1505
 [OUT] A at 1526
 [IN ] IDLE at 1526
-[OUT] IDLE at 1606
-[IN ] A at 1606
+[OUT] IDLE at 1605
+[IN ] A at 1605
 [OUT] A at 1626
 [IN ] B at 1626
 [OUT] B at 1666
 [IN ] C at 1666
-[OUT] C at 1706
-[IN ] A at 1706
-[OUT] A at 1726
-[IN ] C at 1726
+[OUT] C at 1705
+[IN ] A at 1705
+[OUT] A at 1725
+[IN ] C at 1725
 [OUT] C at 1726
 [IN ] IDLE at 1726
-[OUT] IDLE at 1806
-[IN ] A at 1806
-[OUT] A at 1827
+[OUT] IDLE at 1805
+[IN ] A at 1805
+[OUT] A at 1825
+[IN ] B at 1825
+[OUT] B at 1865
+[IN ] IDLE at 1865
+[OUT] IDLE at 1905
+[IN ] A at 1905
+[OUT] A at 1925
+[IN ] IDLE at 1925
+[OUT] IDLE at 2005
+[IN ] A at 2005
+[OUT] A at 2026
