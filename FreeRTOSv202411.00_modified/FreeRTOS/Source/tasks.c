@@ -1922,7 +1922,7 @@ static void prvInitialiseNewTask( TaskFunction_t pxTaskCode,
     }
 
     //here we can write the characteristics of the task in the TCB
-    // int in
+    // int
     // pxNewTCB->period = period_task[index];
     // pxNewTCB->execution_time = execution_time_task[index];
     // pxNewTCB->deadline = deadline_task[index];

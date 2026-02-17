@@ -1,5 +1,5 @@
-#include "scheduler.h"
 #include "FreeRTOS.h"
+#include "scheduler.h"
 #include "task.h"
 #include <stdio.h>
 

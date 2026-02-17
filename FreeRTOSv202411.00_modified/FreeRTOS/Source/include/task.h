@@ -153,6 +153,18 @@ typedef struct xTASK_PARAMETERS
     #if ( ( portUSING_MPU_WRAPPERS == 1 ) && ( configSUPPORT_STATIC_ALLOCATION == 1 ) )
         StaticTask_t * const pxTaskBuffer;
     #endif
+
+        #if ( configUSE_PERIODIC_TASKS == 1 )
+
+        //we should myb add new tasks parameters here, such as period, deadline, execution time, etc. for EDF scheduling
+        TickType_t period;                         /**< The period of the task. */
+        TickType_t deadline;                       /**< The relative deadline of the task. */
+        TickType_t exec_time;                     /**< The execution time of the task. */
+        TickType_t remaining_exec_time;            /**< The remaining execution time of the task. */
+        TickType_t absolute_deadline;              /**< The absolute deadline of the task. */
+
+    #endif /* configUSE_PERIODIC_TASKS == 1 */
+    
 } TaskParameters_t;
 
 /* Used with the uxTaskGetSystemState() function to return the state of each task

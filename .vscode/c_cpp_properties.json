@@ -5,9 +5,9 @@
       "includePath": [
         "${workspaceFolder}/**",
         "${workspaceFolder}/include",
-        "${FREERTOS_PATH}/FreeRTOS/Source/include",
-        "${FREERTOS_PATH}/FreeRTOS/Source",
-        "${FREERTOS_PATH}/FreeRTOS/Source/portable/MSVC-MingW",
+        "${FREERTOS_PATH_M}/FreeRTOS/Source/include",
+        "${FREERTOS_PATH_M}/FreeRTOS/Source",
+        "${FREERTOS_PATH_M}/FreeRTOS/Source/portable/MSVC-MingW",
         "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um",
         "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared",
         "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/winrt"
@@ -15,8 +15,8 @@
       "browse": {
         "path": [
           "${workspaceFolder}/include",
-          "${FREERTOS_PATH}/FreeRTOS/Source",
-          "${FREERTOS_PATH}/FreeRTOS/Source/portable/MSVC-MingW",
+          "${FREERTOS_PATH_M}/FreeRTOS/Source",
+          "${FREERTOS_PATH_M}/FreeRTOS/Source/portable/MSVC-MingW",
           "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um",
           "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared"
         ],
@@ -30,10 +30,10 @@
         "_WINDOWS"
       ],
       "windowsSdkVersion": "10.0.18362.0",
-      "compilerPath": "C:/MinGW/bin/gcc.exe",
+      "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/18/BuildTools/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/cl.exe",
       "cStandard": "c11",
       "cppStandard": "c++17",
-      "intelliSenseMode": "windows-gcc-x64"
+      "intelliSenseMode": "windows-msvc-x64"
     }
   ],
   "version": 4

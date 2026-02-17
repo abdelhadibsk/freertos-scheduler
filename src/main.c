@@ -116,8 +116,13 @@ void periodic_task(void *pvParameters)
     //explaining the line above: we pass the address of the sched_task_t struct as the parameter when creating the task, so we can cast the void* parameter to a sched_task_t* to access the task parameters directly in the task function. This is a common pattern in FreeRTOS to pass multiple parameters to a task through a struct.
 
     // trynig to access the task parameters directly from the TCB using the task handle, we will not use sched_task struct in the task function,     
+    
+    // sched_task_t *task = (sched_task_t *)pvParameters;
     sched_task_t *task = (sched_task_t *)pvParameters;
     TickType_t lastWakeTime = xTaskGetTickCount();
+ 
+    TaskParameters_t *pxTaskParameters = (TaskParameters_t *)pvParameters;
+
 
     for (;;)
     {
