@@ -9,6 +9,9 @@
 #define configNUMBER_OF_CORES           1
 
 /* ================= Scheduling algorithms ================= */
+
+#define configUSE_SCHEDULER 1
+
 #define FIFO_AlGORITHM      0
 #define RM_ALGORITHM        0
 #define DM_ALGORITHM        0

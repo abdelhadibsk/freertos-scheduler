@@ -42,6 +42,10 @@
 #include "timers.h"
 #include "stack_macros.h"
 
+#if ( configUSE_SCHEDULER == 1 )
+    #include "scheduler.h"
+#endif
+
 /* The default definitions are only available for non-MPU ports. The
  * reason is that the stack alignment requirements vary for different
  * architectures.*/
@@ -448,6 +452,11 @@ typedef struct tskTaskControlBlock       /* The old naming convention is used to
     #if ( configUSE_POSIX_ERRNO == 1 )
         int iTaskErrno;
     #endif
+
+    #if ( configUSE_SCHEDULER == 1 )
+        RT_Params_t xRT;        /* Real-time scheduling parameters */
+    #endif
+
 } tskTCB;
 
 /* The old tskTCB name is maintained above then typedefed to the new TCB_t name
@@ -508,6 +517,17 @@ PRIVILEGED_DATA static volatile BaseType_t xNumOfOverflows = ( BaseType_t ) 0;
 PRIVILEGED_DATA static UBaseType_t uxTaskNumber = ( UBaseType_t ) 0U;
 PRIVILEGED_DATA static volatile TickType_t xNextTaskUnblockTime = ( TickType_t ) 0U; /* Initialised to portMAX_DELAY before the scheduler starts. */
 PRIVILEGED_DATA static TaskHandle_t xIdleTaskHandles[ configNUMBER_OF_CORES ];       /**< Holds the handles of the idle tasks.  The idle tasks are created automatically when the scheduler is started. */
+
+#if ( configUSE_SCHEDULER == 1 )
+
+    /* RT task registry — array of TCB pointers + count */
+    static TCB_t *   pxRTTaskList[ configMAX_TASKS ];
+    static UBaseType_t uxRTTaskCount          = 0;
+
+    /* Global release counter — incremented at every job release */
+    static UBaseType_t uxGlobalReleaseCounter = 0;
+
+#endif /* configUSE_RT_SCHEDULER */
 
 /* Improve support for OpenOCD. The kernel tracks Ready tasks via priority lists.
  * For tracking the state of remote threads, OpenOCD uses uxTopUsedPriority
@@ -4719,7 +4739,7 @@ BaseType_t xTaskIncrementTick( void )
      * responsibility to increment the tick, or increment the pended ticks if the
      * scheduler is suspended.  If pended ticks is greater than zero, the core that
      * calls xTaskResumeAll has the responsibility to increment the tick. */
-    if( uxSchedulerSuspended == ( UBaseType_t ) 0U )
+    if( uxSchedulerSuspended == ( UBaseType_t ) 0U )    // if scheduler is not suspended
     {
         /* Minor optimisation.  The tick count cannot change in this
          * block. */
@@ -4886,6 +4906,10 @@ BaseType_t xTaskIncrementTick( void )
         }
         #endif /* configUSE_TICK_HOOK */
 
+        #if ( configUSE_SCHEDULER == 1 )
+            vApplicationSchedulerTickHook();
+        #endif
+
         #if ( configUSE_PREEMPTION == 1 )
         {
             #if ( configNUMBER_OF_CORES == 1 )
@@ -4943,6 +4967,10 @@ BaseType_t xTaskIncrementTick( void )
         {
             vApplicationTickHook();
         }
+        #endif
+        
+        #if ( configUSE_SCHEDULER == 1 )
+            vApplicationSchedulerTickHook();
         #endif
     }
 
@@ -5142,6 +5170,11 @@ BaseType_t xTaskIncrementTick( void )
             /* MISRA Ref 11.5.3 [Void pointer assignment] */
             /* More details at: https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/MISRA.md#rule-115 */
             /* coverity[misra_c_2012_rule_11_5_violation] */
+
+            #if ( configUSE_SCHEDULER == 1 )
+                vApplicationSchedulerUpdatePriorities();
+            #endif
+
             taskSELECT_HIGHEST_PRIORITY_TASK();
             traceTASK_SWITCHED_IN();
 
@@ -8725,3 +8758,148 @@ void vTaskResetState( void )
     #endif /* #if ( configGENERATE_RUN_TIME_STATS == 1 ) */
 }
 /*-----------------------------------------------------------*/
+
+#if ( configUSE_SCHEDULER == 1 )
+
+/* ---------------------------------------------------------
+ * Registry helpers
+ * --------------------------------------------------------- */
+UBaseType_t uxRTGetTaskCount( void )
+{
+    return uxRTTaskCount;
+}
+
+TaskHandle_t xRTGetTaskByIndex( UBaseType_t index )
+{
+    if( index < uxRTTaskCount )
+        return ( TaskHandle_t ) pxRTTaskList[ index ];
+    return NULL;
+}
+
+/* ---------------------------------------------------------
+ * RT parameter getters
+ * Each casts the opaque TaskHandle_t to TCB_t* — safe here
+ * because we are inside tasks.c where TCB_t is defined.
+ * --------------------------------------------------------- */
+TickType_t xRTGetTaskPeriod( TaskHandle_t xTask )
+{
+    taskENTER_CRITICAL();
+    TickType_t val = ( ( TCB_t * ) xTask )->xRT.period;
+    taskEXIT_CRITICAL();
+    return val;
+}
+
+TickType_t xRTGetTaskDeadline( TaskHandle_t xTask )
+{
+    taskENTER_CRITICAL();
+    TickType_t val = ( ( TCB_t * ) xTask )->xRT.deadline;
+    taskEXIT_CRITICAL();
+    return val;
+}
+
+TickType_t xRTGetTaskAbsoluteDeadline( TaskHandle_t xTask )
+{
+    taskENTER_CRITICAL();
+    TickType_t val = ( ( TCB_t * ) xTask )->xRT.absolute_deadline;
+    taskEXIT_CRITICAL();
+    return val;
+}
+
+UBaseType_t uxRTGetTaskReleaseOrder( TaskHandle_t xTask )
+{
+    taskENTER_CRITICAL();
+    UBaseType_t val = ( ( TCB_t * ) xTask )->xRT.release_order;
+    taskEXIT_CRITICAL();
+    return val;
+}
+
+/* ---------------------------------------------------------
+ * State check
+ * Checks if task is in the Ready list at its current priority.
+ * Called from vApplicationSchedulerUpdatePriorities() which
+ * is already inside a critical section — no extra protection needed.
+ * --------------------------------------------------------- */
+BaseType_t xRTIsTaskReady( TaskHandle_t xTask )
+{
+    TCB_t * pxTCB = ( TCB_t * ) xTask;
+
+    if( listIS_CONTAINED_WITHIN(
+            &( pxReadyTasksLists[ pxTCB->uxPriority ] ),
+            &( pxTCB->xStateListItem ) ) )
+    {
+        return pdTRUE;
+    }
+    return pdFALSE;
+}
+
+/* ---------------------------------------------------------
+ * Safe priority setter
+ * vTaskPrioritySet() handles its own critical section internally.
+ * We add clamping here to prevent invalid priority values.
+ * --------------------------------------------------------- */
+void vRTSetTaskPriority( TaskHandle_t xTask, UBaseType_t uxPriority )
+{
+    if( uxPriority >= ( UBaseType_t ) configMAX_PRIORITIES )
+        uxPriority  = ( UBaseType_t ) configMAX_PRIORITIES - 1U;
+
+    if( uxPriority < ( tskIDLE_PRIORITY + 1U ) )
+        uxPriority  =   tskIDLE_PRIORITY + 1U;
+
+    vTaskPrioritySet( xTask, uxPriority );
+}
+
+/* ---------------------------------------------------------
+ * ISR-safe next_release getter
+ * Called from vApplicationRTTickHook() — ISR context.
+ * No critical section needed: tick ISR is the only writer.
+ * --------------------------------------------------------- */
+TickType_t xRTGetNextRelease( TaskHandle_t xTask )
+{
+    return ( ( TCB_t * ) xTask )->xRT.next_release;
+}
+
+/* ---------------------------------------------------------
+ * ISR-safe job release updater
+ * Called from vApplicationRTTickHook() when xNow >= next_release.
+ * Groups all TCB writes for a new job into one place.
+ * --------------------------------------------------------- */
+void vRTJobRelease( TaskHandle_t xTask, TickType_t xNow )
+{
+    TCB_t * pxTCB = ( TCB_t * ) xTask;
+
+    pxTCB->xRT.absolute_deadline = xNow + pxTCB->xRT.deadline;
+    pxTCB->xRT.next_release     += pxTCB->xRT.period;
+    pxTCB->xRT.release_order     = uxGlobalReleaseCounter++;
+}
+
+/* ---------------------------------------------------------
+ * Task Register
+ * Called by xRTTaskCreate() in rt_scheduler.c.
+ * Fills xRT fields inside the TCB and adds to registry.
+ * --------------------------------------------------------- */
+void vApplicationRTTaskRegister(
+    TaskHandle_t xTask,
+    TickType_t   period,
+    TickType_t   deadline,
+    TickType_t   wcet )
+{
+    TCB_t * pxTCB = ( TCB_t * ) xTask;
+
+    configASSERT( pxTCB != NULL );
+    configASSERT( uxRTTaskCount < configMAX_TASKS );
+
+    taskENTER_CRITICAL();
+
+    pxRTTaskList[ uxRTTaskCount++ ] = pxTCB;
+
+    pxTCB->xRT.period            = period;
+    pxTCB->xRT.deadline          = deadline;
+    pxTCB->xRT.wcet              = wcet;
+    pxTCB->xRT.next_release      = xTaskGetTickCount();
+    pxTCB->xRT.absolute_deadline = 0;
+    pxTCB->xRT.release_order     = 0;
+
+    taskEXIT_CRITICAL();
+}
+
+#endif /* configUSE_RT_SCHEDULER */

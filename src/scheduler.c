@@ -1,72 +1,113 @@
+/* =========================================================
+ * rt_scheduler.c
+ * RT Scheduler Extension — Core Engine
+ *
+ * This file contains ONLY the 3 hooks and the task wrapper.
+ * It never touches TCB_t directly.
+ * All TCB access goes through the helpers defined in tasks.c.
+ * ========================================================= */
+
 #include "FreeRTOS.h"
-#include "scheduler.h"
 #include "task.h"
-#include <stdio.h>
+#include "scheduler.h"
 
-static sched_task_t task_table[MAX_TASKS];
-static int task_count = 0;
+/* Policy functions — defined in rt_policies.c */
+extern void vRM_UpdatePriorities( void );
+extern void vDM_UpdatePriorities( void );
+extern void vFIFO_UpdatePriorities( void );
+extern void vEDF_UpdatePriorities( void );
 
-// Task count initialization to zero   
-void scheduler_init(void)
+/* =========================================================
+ * xRTTaskCreate — Task Creation Wrapper
+ * ========================================================= */
+BaseType_t xRTTaskCreate(
+    TaskFunction_t         pxTaskCode,
+    const char * const     pcName,
+    configSTACK_DEPTH_TYPE uxStackDepth,
+    void *                 pvParameters,
+    TickType_t             period,
+    TickType_t             deadline,
+    TickType_t             wcet,
+    TaskHandle_t *         pxCreatedTask )
 {
-    task_count = 0;
-}
+    BaseType_t xResult;
 
-/* Register a task with its temporal parameters */
-void scheduler_register_task(TaskHandle_t task,
-                             TickType_t period,
-                             TickType_t deadline)
-{
-    configASSERT(task_count < MAX_TASKS);   // ensure we don't exceed max tasks
+    xResult = xTaskCreate(
+                  pxTaskCode,
+                  pcName,
+                  uxStackDepth,
+                  pvParameters,
+                  tskIDLE_PRIORITY + 1U,
+                  pxCreatedTask );
 
-    task_table[task_count].handle   = task;
-    task_table[task_count].period   = period;
-    task_table[task_count].deadline = deadline;
-
-    task_count++;
-}
-
-// Apply scheduling policy by updating FreeRTOS priorities 
-void scheduler_apply_policy(sched_policy_t policy){   
-    
-    printf("Applying scheduling policy %d\n", policy);
-    /* Simple bubble sort on period/deadline */
-    for (int i = 0; i < task_count - 1; i++)
+    if( xResult == pdPASS )
     {
-        for (int j = i + 1; j < task_count; j++)
+        /* Register RT params — implemented in tasks.c, has TCB access */
+        vApplicationRTTaskRegister( *pxCreatedTask, period, deadline, wcet );
+
+        /* Suspend — TickHook controls first release */
+        vTaskSuspend( *pxCreatedTask );
+    }
+
+    return xResult;
+}
+
+/* =========================================================
+ * Hook 2 — vApplicationRTTickHook
+ * Called every tick by xTaskIncrementTick() in tasks.c.
+ * ISR context — only FromISR APIs allowed.
+ * ========================================================= */
+void vApplicationSchedulerTickHook( void )
+{
+    UBaseType_t i;
+    BaseType_t  xHigherPriorityTaskWoken = pdFALSE;
+    TickType_t  xNow = xTaskGetTickCountFromISR();
+
+    UBaseType_t n = uxRTGetTaskCount();   /* helper in tasks.c */
+
+    for( i = 0; i < n; i++ )
+    {
+        TaskHandle_t xTask = xRTGetTaskByIndex( i );   /* helper in tasks.c */
+
+        /* Read next_release — we need a local ISR-safe read.
+         * Since we are in ISR context we use a direct field access
+         * via a dedicated helper (no critical section needed inside
+         * ISR as tick interrupt is the only writer of next_release). */
+        TickType_t next_release = xRTGetNextRelease( xTask );
+
+        if( xNow >= next_release )
         {
-            int swap = 0;
+            /* New job — update RT fields via ISR-safe helper */
+            vRTJobRelease( xTask, xNow );   /* helper in tasks.c */
 
-            if (policy == SCHED_RM && task_table[j].period < task_table[i].period){
-                swap = 1;
-                printf("Swapping %d and %d based on period\n", i, j);
-            }
-            if (policy == SCHED_DM && task_table[j].deadline < task_table[i].deadline){
-                swap = 1;
-                printf("Swapping %d and %d based on deadline\n", i, j);
-            }
-
-            if (swap)
+            if( eTaskGetState( xTask ) == eSuspended )
             {
-                sched_task_t tmp = task_table[i];
-                task_table[i] = task_table[j];
-                task_table[j] = tmp;
-                printf("Swapped %d and %d\n", i, j);
-            }else{
-                printf("No swap between %d and %d\n", i, j);
+                vTaskResumeFromISR( xTask );
+                xHigherPriorityTaskWoken = pdTRUE;
             }
         }
-        printf("End of pass %d\n", i);
     }
 
-    /* Assign priorities: highest priority = smallest index */
-    for (int i = 0; i < task_count; i++)
-    {   printf("Setting priority for task %d\n", i);
-        UBaseType_t prio = configTASK_PRIORITY_MAX - i;
-        vTaskPrioritySet(task_table[i].handle, prio);   // the problem was here
-        // comment appeler un hook
-        printf("Set priority %llu for task %p\n", prio, (void*)task_table[i].handle);
+    if( xHigherPriorityTaskWoken == pdTRUE )
+    {
+        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
     }
 }
 
-
+/* =========================================================
+ * Hook 3 — vApplicationSchedulerUpdatePriorities
+ * Called by vTaskSwitchContext() before highest priority selection.
+ * Already inside a critical section — no extra protection needed.
+ * ========================================================= */
+void vApplicationSchedulerUpdatePriorities( void )
+{
+#if   ( configUSE_RM   == 1 )
+    vRM_UpdatePriorities();
+#elif ( configUSE_DM   == 1 )
+    vDM_UpdatePriorities();
+#elif ( configUSE_FIFO == 1 )
+    vFIFO_UpdatePriorities();
+#elif ( configUSE_EDF  == 1 )
+    vEDF_UpdatePriorities();
+#endif
+}

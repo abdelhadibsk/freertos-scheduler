@@ -292,6 +292,32 @@ typedef enum
 /* Checks if core ID is valid. */
 #define taskVALID_CORE_ID( xCoreID )    ( ( ( ( ( BaseType_t ) 0 <= ( xCoreID ) ) && ( ( xCoreID ) < ( BaseType_t ) configNUMBER_OF_CORES ) ) ) ? ( pdTRUE ) : ( pdFALSE ) )
 
+/* =========================================================
+ * HELPER API
+ * Used internally by scheduler.c and rt_policies.c to query and update RT parameters.
+ * Student policy code calls these — never touches TCB directly.
+ * ========================================================= */
+
+#if ( configUSE_SCHEDULER == 1 )
+ 
+    /* Registry */
+    UBaseType_t  uxRTGetTaskCount( void );
+    TaskHandle_t xRTGetTaskByIndex( UBaseType_t index );
+
+    /* Parameter getters */
+    TickType_t   xRTGetTaskPeriod( TaskHandle_t xTask );
+    TickType_t   xRTGetTaskDeadline( TaskHandle_t xTask );
+    TickType_t   xRTGetTaskAbsoluteDeadline( TaskHandle_t xTask );
+    UBaseType_t  uxRTGetTaskReleaseOrder( TaskHandle_t xTask );
+
+    /* State check */
+    BaseType_t   xRTIsTaskReady( TaskHandle_t xTask );
+
+    /* Safe priority setter */
+    void    vRTSetTaskPriority( TaskHandle_t xTask, UBaseType_t uxPriority );
+
+#endif /* configUSE_SCHEDULER == 1 */
+
 /*-----------------------------------------------------------
 * TASK CREATION API
 *----------------------------------------------------------*/
