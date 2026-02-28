@@ -34,11 +34,12 @@ LDFLAGS = /link /machine:x64 /OUT:$(BUILD_DIR)/$(PROJECT_NAME).exe kernel32.lib 
 # Sources
 # =========================================================
 SOURCES = $(SRC_DIR)/main.c \
-          $(SRC_DIR)/scheduler.c \
           $(FREERTOS_SRC)/tasks.c \
           $(FREERTOS_SRC)/queue.c \
           $(FREERTOS_SRC)/timers.c \
           $(FREERTOS_SRC)/list.c \
+		  $(SRC_DIR)/scheduler.c \
+		  $(SRC_DIR)/policies.c \
           $(FREERTOS_MEMMANG)/heap_3.c \
           $(FREERTOS_PORT)/port.c
 

@@ -3,191 +3,172 @@
 #include "scheduler.h"
 #include <stdio.h>
 
-void worker_task(void *pvParameters);
-void periodic_task(void *pvParameters);
-void init_task(void *p);
+/* =========================================================
+ * Task handles
+ * ========================================================= */
+TaskHandle_t tA, tB, tC;
 
-void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName);
-void vApplicationTickHook(void);
+/* =========================================================
+ * Forward declarations
+ * ========================================================= */
+void periodic_task( void *pvParameters );
+void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName );
+void MyTaskSwitchedIn( void );
+void MyTaskSwitchedOut( void );
 
-void MyTaskSwitchedIn(void);
-void MyTaskSwitchedOut(void);
-
-TaskHandle_t tA, tB, tC, tD;
-
-int main(void)
-{   
-    // at the new model i should not need to pass the task parameters to the task function since they are stored in the TCB
-    // we can access them directly from the TCB using the task handle, cuz handle is a pointer to the TCB, so we can define a struct for the task parameters and store it in the TCB when creating the task, and then access it directly in the task function using the handle. This way we can avoid passing the parameters as arguments to the task function and keep the code cleaner.
-
-    // but for simplicity i will pass them as parameters to the task function in this example, and we can later modify the code to access them directly from the TCB in the task function if needed. This way we can keep the task function simple and focused on its execution logic without worrying about how to access its parameters.
-
-    printf("MAIN START\n");
-    setvbuf(stdout, NULL, _IONBF, 0);
-
-    scheduler_init();   //count 0
-
-    // Create user tasks
-    sched_task_t taskA, taskB, taskC;
-
-    // tasks parameters
-    taskA.period    = pdMS_TO_TICKS(100);   // Ti = 100ms
-    taskA.deadline  = pdMS_TO_TICKS(100);   // Di = 100ms
-    taskA.exec_time = pdMS_TO_TICKS(20);    // Ci = 20ms
-    taskA.handle = tA;
-
-    taskB.period    = pdMS_TO_TICKS(200);
-    taskB.deadline  = pdMS_TO_TICKS(200);
-    taskB.exec_time = pdMS_TO_TICKS(40);
-    taskB.handle = tB;
-
-    taskC.period    = pdMS_TO_TICKS(400);   
-    taskC.deadline  = pdMS_TO_TICKS(400);
-    taskC.exec_time = pdMS_TO_TICKS(60);
-    taskC.handle = tC;
-
-    // we can add a hook function to xTaskCreate to add this parameters directly when creating the task
-    // we can add this infos to a config struct passed to the task in scheduler.h or we can create a wrapper around xTaskCreate to do this in one step
-
-    // trying to use only the handle to access the task parameters in the task function, so we will not pass the parameters as arguments to the task function, but we will store them in the TCB when creating the task, and then access them directly in the task function using the handle.
-    // the problem now is that we can t acces the TCB directly since it is not exposed in the FreeRTOS API, 
-    xTaskCreate(periodic_task, "A", 1024, &taskA, 1, &tA); 
-    xTaskCreate(periodic_task, "B", 1024, &taskB, 1, &tB);
-    xTaskCreate(periodic_task, "C", 1024, &taskC, 1, &tC);
-    printf("tasks created\n");
-    // print tasks info
-    fflush(stdout);
-
-
-    printf("Task A: period=%lu, deadline=%lu, exec_time=%lu\n", taskA.period, taskA.deadline, taskA.exec_time);
-    printf("Task B: period=%lu, deadline=%lu, exec_time=%lu\n", taskB.period, taskB.deadline, taskB.exec_time);
-    printf("Task C: period=%lu, deadline=%lu, exec_time=%lu\n", taskC.period, taskC.deadline, taskC.exec_time);
-
-    fflush(stdout);
-    // replace this four lines by a function canlled inside xTaskCreate to register the task directly when creating it 
-    
-    scheduler_register_task(tA, taskA.period, taskA.deadline);
-    scheduler_register_task(tB, taskB.period, taskB.deadline);
-    scheduler_register_task(tC, taskC.period, taskC.deadline);
-    printf("tasks registered\n");
-    fflush(stdout);
-
-    xTaskCreate(init_task, "Init", 1024, NULL, configSCHEDULER_PRIORITY, NULL);
-    printf("Starting scheduler\n");
-    fflush(stdout);
-
-    vTaskStartScheduler();  // This should never return
-    for (;;);
-}
-
-void init_task(void *p)
+/* =========================================================
+ * main
+ * ========================================================= */
+int main( void )
 {
-    printf("INIT TASK START\n");
+    printf( "MAIN START\n" );
+    setvbuf( stdout, NULL, _IONBF, 0 );
 
-    // Choose scheduling policy 
-    // scheduler_apply_policy(SCHED_RM);
-    // scheduler_apply_policy(SCHED_DM);
-    // scheduler_apply_policy(SCHED_FIFO);
+    /* Create RT periodic tasks.
+     * No need to pass parameters to the task function —
+     * everything is stored inside the TCB via xRTTaskCreate. */
+    xRTTaskCreate( periodic_task, "A", 1024, NULL,
+                   pdMS_TO_TICKS( 100 ),   /* period   */
+                   pdMS_TO_TICKS( 100 ),   /* deadline */
+                   pdMS_TO_TICKS( 20  ),   /* wcet     */
+                   &tA );
 
-    scheduler_apply_policy(SCHED_RM);
+    xRTTaskCreate( periodic_task, "B", 1024, NULL,
+                   pdMS_TO_TICKS( 200 ),
+                   pdMS_TO_TICKS( 200 ),
+                   pdMS_TO_TICKS( 40  ),
+                   &tB );
 
-    printf("INIT TASK DONE\n");
-    vTaskDelete(NULL);
-    
-}
+    xRTTaskCreate( periodic_task, "C", 1024, NULL,
+                   pdMS_TO_TICKS( 400 ),
+                   pdMS_TO_TICKS( 400 ),
+                   pdMS_TO_TICKS( 60  ),
+                   &tC );
 
-// Simple worker task (not periodic, for testing)
-void worker_task(void *pvParameters)    
-{
-    const char *name = (const char *)pvParameters;
-
-    for (;;)
+    /* Print registered task info using helper API */
+    printf( "Tasks created and registered:\n" );
+    for( UBaseType_t i = 0; i < uxRTGetTaskCount(); i++ )
     {
-        printf("Task %s running\n", name);
-        vTaskDelay(pdMS_TO_TICKS(100)); // to simulate work
+        TaskHandle_t h = xRTGetTaskByIndex( i );
+        printf( "  Task %s: period=%lu  deadline=%lu  wcet=%lu\n",
+                pcTaskGetName( h ),
+                ( unsigned long ) xRTGetTaskPeriod( h ),
+                ( unsigned long ) xRTGetTaskDeadline( h ),
+                ( unsigned long ) xRTGetTaskWCET( h ) );
     }
+
+    /* Active policy shown at startup */
+#if   ( configUSE_RM   == 1 )
+    printf( "Policy: Rate Monotonic (RM)\n" );
+#elif ( configUSE_DM   == 1 )
+    printf( "Policy: Deadline Monotonic (DM)\n" );
+#elif ( configUSE_FIFO == 1 )
+    printf( "Policy: FIFO\n" );
+#elif ( configUSE_EDF  == 1 )
+    printf( "Policy: Earliest Deadline First (EDF)\n" );
+#endif
+
+    fflush( stdout );
+
+    printf( "Starting scheduler\n" );
+    vTaskStartScheduler();
+
+    for( ;; );
+    return 0;
 }
-// task apériodique isr , etats 
 
-// PERIODIC TASK WITH CONTROLLED EXECUTION TIME 
-void periodic_task(void *pvParameters)
+/* =========================================================
+ * PERIODIC TASK
+ *
+ * No parameters passed — everything is read directly from
+ * the TCB via the helper API using the current task handle.
+ *
+ * Pattern:
+ *   1. Do work (busy wait for wcet duration)
+ *   2. Print job info
+ *   3. Suspend — TickHook will release next job
+ * ========================================================= */
+void periodic_task( void *pvParameters )
 {
-    // sched_task_t *task = (sched_task_t *)pvParameters;   //this line is not really necessary since we can access the task parameters directly from the TCB using the task handle, but it simplifies the code for this example
-    //explaining the line above: we pass the address of the sched_task_t struct as the parameter when creating the task, so we can cast the void* parameter to a sched_task_t* to access the task parameters directly in the task function. This is a common pattern in FreeRTOS to pass multiple parameters to a task through a struct.
+    ( void ) pvParameters;
 
-    // trynig to access the task parameters directly from the TCB using the task handle, we will not use sched_task struct in the task function,     
-    
-    // sched_task_t *task = (sched_task_t *)pvParameters;
-    sched_task_t *task = (sched_task_t *)pvParameters;
-    TickType_t lastWakeTime = xTaskGetTickCount();
- 
-    TaskParameters_t *pxTaskParameters = (TaskParameters_t *)pvParameters;
-
-
-    for (;;)
+    for( ;; )
     {
-        /* ===== Activation périodique stricte ===== */
-        vTaskDelayUntil(&lastWakeTime, task->period);
-        task->last_release = lastWakeTime;
+        TaskHandle_t self    = xTaskGetCurrentTaskHandle();
+        TickType_t   wcet    = xRTGetTaskWCET( self );
+        TickType_t   start   = xTaskGetTickCount();
 
-        /* ===== Début du job ===== */
-        //printf("[JOB START] Task %s at %lu\n", pcTaskGetName(NULL), (unsigned long)xTaskGetTickCount());
+        printf( "[START] %s  tick=%lu  wcet=%lu\n",
+                pcTaskGetName( self ),
+                ( unsigned long ) start,
+                ( unsigned long ) wcet );
 
-        TickType_t exec_start = xTaskGetTickCount();
-
-        /* ===== Exécution contrôlée ===== */
-        while ((xTaskGetTickCount() - exec_start) < task->exec_time)
-        {   // simulate work
-            //taskYIELD();  // permet la préemption utile cas de priorité égale
+        /* Simulate workload — busy wait for wcet duration */
+        while( ( xTaskGetTickCount() - start ) < wcet )
+        {
+            /* intentionally empty */
         }
 
-        /* ===== Fin du job ===== */
         TickType_t finish = xTaskGetTickCount();
+        printf( "[END  ] %s  tick=%lu  exec=%lu\n",
+                pcTaskGetName( self ),
+                ( unsigned long ) finish,
+                ( unsigned long ) ( finish - start ) );
 
-        //printf("[JOB END] Task %s at %lu (exec = %lu)\n",pcTaskGetName(NULL), (unsigned long)finish, (unsigned long)(finish - exec_start));
+        /* Job done — TickHook will resume at next release */
+        vTaskSuspend( NULL );
     }
 }
 
-// Stack overflow hook
-void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+/* =========================================================
+ * Hook — Stack Overflow
+ * ========================================================= */
+void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName )
 {
-    (void) xTask;
-    (void) pcTaskName;
-
+    ( void ) xTask;
+    printf( "STACK OVERFLOW: %s\n", pcTaskName );
     taskDISABLE_INTERRUPTS();
-    for (;;);
+    for( ;; );
 }
 
-// Task switch in/out hooks for tracing 
-void MyTaskSwitchedIn(void)
+/* =========================================================
+ * Hooks — Task Switch Trace
+ * Called by FreeRTOS trace macros (traceTASK_SWITCHED_IN /
+ * traceTASK_SWITCHED_OUT) — define these macros in
+ * FreeRTOSConfig.h to enable tracing:
+ *
+ *   #define traceTASK_SWITCHED_IN()  MyTaskSwitchedIn()
+ *   #define traceTASK_SWITCHED_OUT() MyTaskSwitchedOut()
+ * ========================================================= */
+void MyTaskSwitchedIn( void )
 {
     TaskHandle_t h = xTaskGetCurrentTaskHandle();
-
-    printf("[IN ] %s at %lu\n", pcTaskGetName(h), (unsigned long)xTaskGetTickCount());
-
+    printf( "[IN ] %s at %lu\n",
+            pcTaskGetName( h ),
+            ( unsigned long ) xTaskGetTickCount() );
 }
 
-void MyTaskSwitchedOut(void)
+void MyTaskSwitchedOut( void )
 {
     TaskHandle_t h = xTaskGetCurrentTaskHandle();
-    printf("[OUT] %s at %lu\n", pcTaskGetName(h), (unsigned long)xTaskGetTickCount());
+    printf( "[OUT] %s at %lu\n",
+            pcTaskGetName( h ),
+            ( unsigned long ) xTaskGetTickCount() );
 }
 
-// And update the tick hook to use the simpler version:
-void vApplicationTickHook(void)
+/* =========================================================
+ * Hook — Tick
+ * vApplicationRTTickHook() is called automatically inside
+ * xTaskIncrementTick() via the tasks.c modification.
+ * This hook is for application-level periodic logging only.
+ * ========================================================= */
+void vApplicationTickHook( void )
 {
     static TickType_t tickCount = 0;
     tickCount++;
 
-    if ((tickCount % 100) == 0)
+    if( ( tickCount % 100 ) == 0 )
     {
-        printf("[TICK] %lu ticks elapsed\n", (unsigned long)tickCount);
-        /*
-        if ((tickCount % 100) == 0) 
-        {
-            show_specific_task_states();
-        }
-        */    
+        printf( "[TICK] %lu\n", ( unsigned long ) tickCount );
     }
 }
-

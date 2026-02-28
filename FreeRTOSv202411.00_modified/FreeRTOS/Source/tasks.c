@@ -387,6 +387,7 @@ typedef struct tskTaskControlBlock       /* The old naming convention is used to
         TickType_t absolute_deadline;              /**< The absolute deadline of the task. */
 
     #endif /* configUSE_PERIODIC_TASKS == 1 */
+
     
     // We can also add other parameters such as remaining execution time, absolute deadline, etc. if needed for the scheduling algorithm.
 
@@ -521,7 +522,7 @@ PRIVILEGED_DATA static TaskHandle_t xIdleTaskHandles[ configNUMBER_OF_CORES ];  
 #if ( configUSE_SCHEDULER == 1 )
 
     /* RT task registry — array of TCB pointers + count */
-    static TCB_t *   pxRTTaskList[ configMAX_TASKS ];
+    static TCB_t *   pxRTTaskList[ configMAX_RT_TASKS ];
     static UBaseType_t uxRTTaskCount          = 0;
 
     /* Global release counter — incremented at every job release */
@@ -8789,6 +8790,14 @@ TickType_t xRTGetTaskPeriod( TaskHandle_t xTask )
     return val;
 }
 
+TickType_t xRTGetTaskWCET( TaskHandle_t xTask )
+{
+    taskENTER_CRITICAL();
+    TickType_t val = ( ( TCB_t * ) xTask )->xRT.wcet;
+    taskEXIT_CRITICAL();
+    return val;
+}
+
 TickType_t xRTGetTaskDeadline( TaskHandle_t xTask )
 {
     taskENTER_CRITICAL();
@@ -8886,7 +8895,7 @@ void vApplicationRTTaskRegister(
     TCB_t * pxTCB = ( TCB_t * ) xTask;
 
     configASSERT( pxTCB != NULL );
-    configASSERT( uxRTTaskCount < configMAX_TASKS );
+    configASSERT( uxRTTaskCount < configMAX_RT_TASKS );
 
     taskENTER_CRITICAL();
 

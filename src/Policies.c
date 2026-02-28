@@ -8,8 +8,8 @@
  *   vFIFO_UpdatePriorities()
  *   vEDF_UpdatePriorities()
  *
- * vApplicationSchedulerUpdatePriorities() in rt_scheduler.c
- * calls the correct one based on the config in rt_scheduler.h.
+ * vApplicationSchedulerUpdatePriorities() in scheduler.c
+ * calls the correct one based on the config in scheduler.h.
  *
  * All policies use only the helper API — they never touch
  * the TCB or FreeRTOS internals directly.
@@ -56,7 +56,7 @@ static void prvApplyRanks( UBaseType_t * ranks, UBaseType_t n )
 void vRM_UpdatePriorities( void )
 {
     UBaseType_t n = uxRTGetTaskCount();
-    UBaseType_t ranks[ configMAX_TASKS ] = { 0 };
+    UBaseType_t ranks[ configMAX_RT_TASKS ] = { 0 };
     UBaseType_t i, j;
 
     if( n == 0 ) return;
@@ -90,7 +90,7 @@ void vRM_UpdatePriorities( void )
 void vDM_UpdatePriorities( void )
 {
     UBaseType_t n = uxRTGetTaskCount();
-    UBaseType_t ranks[ configMAX_TASKS ] = { 0 };
+    UBaseType_t ranks[ configMAX_RT_TASKS ] = { 0 };
     UBaseType_t i, j;
 
     if( n == 0 ) return;
@@ -122,7 +122,7 @@ void vDM_UpdatePriorities( void )
 void vFIFO_UpdatePriorities( void )
 {
     UBaseType_t n = uxRTGetTaskCount();
-    UBaseType_t ranks[ configMAX_TASKS ] = { 0 };
+    UBaseType_t ranks[ configMAX_RT_TASKS ] = { 0 };
     UBaseType_t i, j;
 
     if( n == 0 ) return;
@@ -168,7 +168,7 @@ void vFIFO_UpdatePriorities( void )
 void vEDF_UpdatePriorities( void )
 {
     UBaseType_t n = uxRTGetTaskCount();
-    UBaseType_t ranks[ configMAX_TASKS ] = { 0 };
+    UBaseType_t ranks[ configMAX_RT_TASKS ] = { 0 };
     UBaseType_t i, j;
 
     if( n == 0 ) return;

@@ -79,12 +79,13 @@ void vApplicationSchedulerTickHook( void )
         {
             /* New job — update RT fields via ISR-safe helper */
             vRTJobRelease( xTask, xNow );   /* helper in tasks.c */
-
-            if( eTaskGetState( xTask ) == eSuspended )
+            /*
+            if( eTaskGetState( xTask ) == eSuspended )  
             {
                 vTaskResumeFromISR( xTask );
                 xHigherPriorityTaskWoken = pdTRUE;
             }
+                */
         }
     }
 

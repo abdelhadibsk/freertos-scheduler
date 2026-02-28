@@ -307,6 +307,7 @@ typedef enum
     /* Parameter getters */
     TickType_t   xRTGetTaskPeriod( TaskHandle_t xTask );
     TickType_t   xRTGetTaskDeadline( TaskHandle_t xTask );
+    TickType_t   xRTGetTaskWCET( TaskHandle_t xTask );
     TickType_t   xRTGetTaskAbsoluteDeadline( TaskHandle_t xTask );
     UBaseType_t  uxRTGetTaskReleaseOrder( TaskHandle_t xTask );
 
