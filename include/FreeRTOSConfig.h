@@ -58,6 +58,8 @@
 #define INCLUDE_vTaskPrioritySet        1   //to use vTaskPrioritySet in scheduler_apply_policy
 #define INCLUDE_vTaskDelete             1
 
+#define INCLUDE_xTaskResumeFromISR  1   // to use xTaskResumeFromISR in vApplicationSchedulerTickHook
+
 /* ================= ASSERT ================= */
 
 #define configASSERT(x) \
