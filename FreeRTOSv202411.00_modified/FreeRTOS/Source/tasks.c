@@ -8765,6 +8765,9 @@ void vTaskResetState( void )
 /* ---------------------------------------------------------
  * Registry helpers
  * --------------------------------------------------------- */
+/* UBaseType_t uxRTGetTaskCount( void )
+ * Returns the number of registered RT tasks. Called from scheduler.c.
+ * --------------------------------------------------------- */
 UBaseType_t uxRTGetTaskCount( void )
 {
     return uxRTTaskCount;

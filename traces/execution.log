@@ -15,46 +15,46 @@ hi from xTaskCreate
 [IN ] A at 1
 [OUT] A at 1
 [IN ] A at 1
-[START] A  tick=2  wcet=20
-[END  ] A  tick=22  exec=20
-[OUT] A at 23
-[IN ] B at 23
-[START] B  tick=23  wcet=40
-[END  ] B  tick=63  exec=40
-[OUT] B at 63
-[IN ] C at 63
-[START] C  tick=64  wcet=60
+[START] A  tick=1  wcet=20
+[END  ] A  tick=21  exec=20
+[OUT] A at 21
+[IN ] B at 21
+[START] B  tick=22  wcet=40
+[END  ] B  tick=62  exec=40
+[OUT] B at 62
+[IN ] C at 62
+[START] C  tick=63  wcet=60
 [OUT] C at 100
 [IN ] A at 100
 [START] A  tick=100  wcet=20
 [END  ] A  tick=120  exec=20
-[OUT] A at 120
-[IN ] C at 120
-[END  ] C  tick=124  exec=60
-[OUT] C at 124
-[IN ] IDLE at 124
+[OUT] A at 122
+[IN ] C at 122
+[END  ] C  tick=123  exec=60
+[OUT] C at 123
+[IN ] IDLE at 123
 [OUT] IDLE at 200
 [IN ] A at 200
-[START] A  tick=201  wcet=20
-[END  ] A  tick=221  exec=20
+[START] A  tick=200  wcet=20
+[END  ] A  tick=220  exec=20
 [OUT] A at 221
 [IN ] B at 221
-[START] B  tick=222  wcet=40
-[END  ] B  tick=262  exec=40
+[START] B  tick=221  wcet=40
+[END  ] B  tick=261  exec=40
 [OUT] B at 262
 [IN ] IDLE at 262
 [OUT] IDLE at 300
 [IN ] A at 300
-[START] A  tick=300  wcet=20
-[END  ] A  tick=320  exec=20
-[OUT] A at 320
-[IN ] IDLE at 320
+[START] A  tick=301  wcet=20
+[END  ] A  tick=321  exec=20
+[OUT] A at 321
+[IN ] IDLE at 321
 [OUT] IDLE at 400
 [IN ] A at 400
 [START] A  tick=400  wcet=20
 [END  ] A  tick=420  exec=20
-[OUT] A at 420
-[IN ] B at 420
+[OUT] A at 421
+[IN ] B at 421
 [START] B  tick=421  wcet=40
 [END  ] B  tick=461  exec=40
 [OUT] B at 461
@@ -64,21 +64,21 @@ hi from xTaskCreate
 [IN ] A at 500
 [START] A  tick=500  wcet=20
 [END  ] A  tick=520  exec=20
-[OUT] A at 521
-[IN ] C at 521
+[OUT] A at 520
+[IN ] C at 520
 [END  ] C  tick=522  exec=60
-[OUT] C at 523
-[IN ] IDLE at 523
+[OUT] C at 522
+[IN ] IDLE at 522
 [OUT] IDLE at 600
 [IN ] A at 600
-[START] A  tick=601  wcet=20
-[END  ] A  tick=621  exec=20
-[OUT] A at 622
-[IN ] B at 622
-[START] B  tick=623  wcet=40
-[END  ] B  tick=663  exec=40
-[OUT] B at 663
-[IN ] IDLE at 663
+[START] A  tick=600  wcet=20
+[END  ] A  tick=620  exec=20
+[OUT] A at 620
+[IN ] B at 620
+[START] B  tick=621  wcet=40
+[END  ] B  tick=661  exec=40
+[OUT] B at 661
+[IN ] IDLE at 661
 [OUT] IDLE at 700
 [IN ] A at 700
 [START] A  tick=700  wcet=20
@@ -91,18 +91,18 @@ hi from xTaskCreate
 [END  ] A  tick=820  exec=20
 [OUT] A at 820
 [IN ] B at 820
-[START] B  tick=821  wcet=40
-[END  ] B  tick=861  exec=40
-[OUT] B at 861
-[IN ] C at 861
-[START] C  tick=862  wcet=60
+[START] B  tick=820  wcet=40
+[END  ] B  tick=860  exec=40
+[OUT] B at 860
+[IN ] C at 860
+[START] C  tick=861  wcet=60
 [OUT] C at 900
 [IN ] A at 900
-[START] A  tick=901  wcet=20
-[END  ] A  tick=921  exec=20
+[START] A  tick=900  wcet=20
+[END  ] A  tick=920  exec=20
 [OUT] A at 921
 [IN ] C at 921
-[END  ] C  tick=922  exec=60
+[END  ] C  tick=922  exec=61
 [OUT] C at 922
 [IN ] IDLE at 922
 [OUT] IDLE at 1000
@@ -134,9 +134,9 @@ hi from xTaskCreate
 [START] C  tick=1262  wcet=60
 [OUT] C at 1300
 [IN ] A at 1300
-[START] A  tick=1300  wcet=20
-[END  ] A  tick=1320  exec=20
-[OUT] A at 1320
-[IN ] C at 1320
+[START] A  tick=1301  wcet=20
+[END  ] A  tick=1321  exec=20
+[OUT] A at 1321
+[IN ] C at 1321
 [END  ] C  tick=1322  exec=60
 [OUT] C at 1322

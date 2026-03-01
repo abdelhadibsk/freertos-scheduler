@@ -53,9 +53,12 @@ BaseType_t xRTTaskCreate(
 }
 
 /* =========================================================
- * Hook 2 — vApplicationRTTickHook
+ * Hook 2 — vApplicationSchedulerTickHook
  * Called every tick by xTaskIncrementTick() in tasks.c.
- * ISR context — only FromISR APIs allowed.
+ * ISR context — only FromISR APIs allowed. because of the critical section inside xTaskIncrementTick(), we are guaranteed that only one tick hook runs at a time.
+ * this hook is responsible for releasing jobs at their next_release time and resuming tasks if needed.
+ * release logic:
+ *   for each task, check if xNow >= next_release (read via helper). If so, call vRTJobRelease (helper) to update RT fields for the new job, and resume the task if it was suspended.
  * ========================================================= */
 void vApplicationSchedulerTickHook( void )
 {
@@ -64,7 +67,8 @@ void vApplicationSchedulerTickHook( void )
     TickType_t  xNow = xTaskGetTickCountFromISR();
 
     UBaseType_t n = uxRTGetTaskCount();   /* helper in tasks.c */
-
+    // Loop through all registered tasks and release those whose next_release has arrived.
+    // Note: we could optimize this by keeping a sorted list of next_release times, but for simplicity we just loop through all tasks every tick.
     for( i = 0; i < n; i++ )
     {
         TaskHandle_t xTask = xRTGetTaskByIndex( i );   /* helper in tasks.c */

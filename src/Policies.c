@@ -1,5 +1,5 @@
 /* =========================================================
- * rt_policies.c
+ * policies.c
  * RT Scheduling Policies — RM, DM, FIFO, EDF
  *
  * Each policy implements one function:
@@ -164,6 +164,10 @@ void vFIFO_UpdatePriorities( void )
  * Rule    : Smallest absolute_deadline → Highest priority (dynamic)
  * Theory  : Optimal online algorithm — can schedule any set with U <= 1
  * Note    : absolute_deadline updated every job release in TickHook
+ * 
+ * This version of EDF is non-work-conserving: if a task misses its deadline and is still ready, it will keep the same absolute_deadline and thus the same priority, allowing other tasks to run. A work-conserving version would need to update absolute_deadline on every tick for ready tasks, which would be more complex and costly.
+ * Change the logic in vEDF_UpdatePriorities if you want a work-conserving version.
+ * Possible improvement: maintain a sorted list of ready tasks by absolute_deadline to avoid O(n^2) ranking.
  * ========================================================= */
 void vEDF_UpdatePriorities( void )
 {
