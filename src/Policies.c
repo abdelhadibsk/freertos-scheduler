@@ -76,7 +76,7 @@ void vRM_UpdatePriorities( void )
             else if( ( periodJ == periodI ) && ( j < i ) )   ranks[ i ]++;
         }
     }
-
+    
     prvApplyRanks( ranks, n );
 }
 

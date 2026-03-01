@@ -1,5 +1,5 @@
 /* =========================================================
- * rt_scheduler.c
+ * scheduler.c
  * RT Scheduler Extension — Core Engine
  *
  * This file contains ONLY the 3 hooks and the task wrapper.
@@ -11,7 +11,7 @@
 #include "task.h"
 #include "scheduler.h"
 
-/* Policy functions — defined in rt_policies.c */
+/* Policy functions — defined in policies.c */
 extern void vRM_UpdatePriorities( void );
 extern void vDM_UpdatePriorities( void );
 extern void vFIFO_UpdatePriorities( void );
@@ -40,7 +40,10 @@ BaseType_t xRTTaskCreate(
                   tskIDLE_PRIORITY + 1U,
                   pxCreatedTask );
 
-    if( xResult == pdPASS )
+    /* if the task is created xResult = pdPASS 
+     * else if the creation fails xResult = pdFALSE */
+
+    if( xResult == pdPASS ) 
     {
         /* Register RT params — implemented in tasks.c, has TCB access */
         vApplicationRTTaskRegister( *pxCreatedTask, period, deadline, wcet );
@@ -67,8 +70,10 @@ void vApplicationSchedulerTickHook( void )
     TickType_t  xNow = xTaskGetTickCountFromISR();
 
     UBaseType_t n = uxRTGetTaskCount();   /* helper in tasks.c */
-    // Loop through all registered tasks and release those whose next_release has arrived.
-    // Note: we could optimize this by keeping a sorted list of next_release times, but for simplicity we just loop through all tasks every tick.
+
+    /* Loop through all registered tasks and release those whose next_release has arrived.
+     * Note: we could optimize this by keeping a sorted list of next_release times, 
+     * but for simplicity we just loop through all tasks every tick. */
     for( i = 0; i < n; i++ )
     {
         TaskHandle_t xTask = xRTGetTaskByIndex( i );   /* helper in tasks.c */
