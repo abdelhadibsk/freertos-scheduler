@@ -96,26 +96,35 @@ void periodic_task( void *pvParameters )
     {
         TaskHandle_t self    = xTaskGetCurrentTaskHandle();
         TickType_t   wcet    = xRTGetTaskWCET( self );
-        TickType_t   start   = xTaskGetTickCount();
+        TickType_t   elapsed = 0;
+        TickType_t   slice_start;
 
         printf( "[START] %s  tick=%lu  wcet=%lu\n",
                 pcTaskGetName( self ),
-                ( unsigned long ) start,
+                ( unsigned long ) xTaskGetTickCount(),
                 ( unsigned long ) wcet );
 
-        /* Simulate workload — busy wait for wcet duration */
-        while( ( xTaskGetTickCount() - start ) < wcet )
+        /* Exécute par tranches — accumule seulement le temps CPU réel.
+         * Si préemptée entre deux tranches, le temps perdu n'est pas compté. */
+        while( elapsed < wcet )
         {
-            /* intentionally empty */
+            slice_start = xTaskGetTickCount();
+
+            /* Tranche de travail — 1 tick à la fois */
+            while( xTaskGetTickCount() == slice_start )
+            {
+                /* busy work pendant exactement 1 tick */
+            }
+
+            elapsed++;   /* 1 tick CPU consommé */
         }
 
         TickType_t finish = xTaskGetTickCount();
         printf( "[END  ] %s  tick=%lu  exec=%lu\n",
                 pcTaskGetName( self ),
                 ( unsigned long ) finish,
-                ( unsigned long ) ( finish - start ) );
+                ( unsigned long ) elapsed );
 
-        /* Job done — TickHook will resume at next release */
         vTaskSuspend( NULL );
     }
 }
