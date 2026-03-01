@@ -1,5 +1,6 @@
 import re
 import matplotlib.pyplot as plt
+import itertools
 
 # =========================
 # CONFIGURATION
@@ -11,20 +12,22 @@ IGNORE_TASKS = {"Init", "IDLE"}
 
 # =========================
 # REGEX PATTERNS
-# ========================= 
-JOB_START_RE = re.compile(r"\[IN \] (\w+) at (\d+)")
-JOB_END_RE   = re.compile(r"\[OUT\] (\w+) at (\d+)")
+# =========================
 TASK_INFO_RE = re.compile(
-    r"Task (\w+): period=(\d+), deadline=(\d+), exec_time=(\d+)"
+    r"Task (\w+): period=(\d+)\s+deadline=(\d+)\s+wcet=(\d+)"
 )
+
+START_EXEC_RE = re.compile(r"\[START\]\s+(\w+)\s+tick=(\d+)")
+END_EXEC_RE   = re.compile(r"\[END\s*\]\s+(\w+)\s+tick=(\d+)")
+OUT_RE        = re.compile(r"\[OUT\]\s+(\w+)\s+at\s+(\d+)")
 
 # =========================
 # DATA STRUCTURES
 # =========================
-start_times = {}
-intervals = {}
 task_periods = {}
-time_offset = 0   # <-- NEW
+intervals = {}
+exec_start_times = {}
+time_offset = None
 
 # =========================
 # PARSE LOG FILE
@@ -32,7 +35,7 @@ time_offset = 0   # <-- NEW
 with open(LOG_FILE, "r") as f:
     for line in f:
 
-        # Extract period
+        # Extract task info (period)
         task_info = TASK_INFO_RE.search(line)
         if task_info:
             name = task_info.group(1)
@@ -40,40 +43,66 @@ with open(LOG_FILE, "r") as f:
             task_periods[name] = period
             continue
 
-        # START
-        start_match = JOB_START_RE.search(line)
+        # Execution START
+        start_match = START_EXEC_RE.search(line)
         if start_match:
             task = start_match.group(1)
-            time = int(start_match.group(2))
-            start_times[task] = time
+            tick = int(start_match.group(2))
+
+            # define time offset from first execution
+            if time_offset is None:
+                time_offset = tick
+
+            exec_start_times[task] = tick - time_offset
             continue
 
-        # END
-        end_match = JOB_END_RE.search(line)
+        # Execution END (normal finish)
+        end_match = END_EXEC_RE.search(line)
         if end_match:
             task = end_match.group(1)
-            end_time = int(end_match.group(2))
-
-            # Capture Init end as time reference
-            if task == "Init":
-                time_offset = end_time
-                continue
+            tick = int(end_match.group(2))
 
             if task in IGNORE_TASKS:
                 continue
 
-            if task not in start_times:
+            if task in exec_start_times:
+                start_time = exec_start_times[task]
+                end_time = tick - time_offset
+                duration = end_time - start_time
+
+                intervals.setdefault(task, []).append(
+                    (start_time, duration)
+                )
+
+                del exec_start_times[task]
+            continue
+
+        # Context switch OUT (possible preemption)
+        out_match = OUT_RE.search(line)
+        if out_match:
+            task = out_match.group(1)
+            tick = int(out_match.group(2))
+
+            if task in IGNORE_TASKS:
                 continue
 
-            # Shift time
-            start_time = start_times[task] - time_offset
-            end_time = end_time - time_offset
+            if task in exec_start_times:
+                start_time = exec_start_times[task]
+                end_time = tick - time_offset
+                duration = end_time - start_time
 
-            duration = end_time - start_time
+                intervals.setdefault(task, []).append(
+                    (start_time, duration)
+                )
 
-            intervals.setdefault(task, []).append(
-                (start_time, duration)
-            )
+                del exec_start_times[task]
+            continue
+
+# =========================
+# SORT INTERVALS
+# =========================
+for task in intervals:
+    intervals[task].sort()
 
 # =========================
 # FIND MAX TIME
@@ -84,28 +113,52 @@ for task in intervals:
         max_time = max(max_time, start + dur)
 
 # =========================
+# AUTO TICK STEP SELECTION
+# =========================
+def choose_tick_step(max_time):
+    if max_time <= 200:
+        return 10
+    elif max_time <= 1000:
+        return 50
+    elif max_time <= 5000:
+        return 100
+    else:
+        return 500
+
+tick_step = choose_tick_step(max_time)
+minor_step = tick_step // 5
+
+# =========================
 # ASCII TIMELINE
 # =========================
 print("\n================ ASCII SCHEDULING TIMELINE ================\n")
 
-for task in sorted(intervals.keys()):
+for task in sorted(intervals.keys(), key=lambda t: task_periods.get(t, 9999)):
     for i, (start, dur) in enumerate(intervals[task], 1):
         print(f"{task}{i:<2} : [{start:>5} ---- {start + dur:>5}]")
 
 # =========================
 # GANTT DIAGRAM
 # =========================
-fig, ax = plt.subplots(figsize=(14, 5))
+fig, ax = plt.subplots(figsize=(16, 6))
 
 y = 0
 yticks = []
 ylabels = []
 
-for task in sorted(intervals.keys()):
+colors = itertools.cycle(plt.cm.tab10.colors)
 
-    ax.broken_barh(intervals[task], (y, 0.8))
+for task in sorted(intervals.keys(), key=lambda t: task_periods.get(t, 9999)):
 
-    # Activation impulses (shifted)
+    color = next(colors)
+
+    ax.broken_barh(
+        intervals[task],
+        (y, 0.8),
+        facecolors=color
+    )
+
+    # Activation impulses (RM)
     if task in task_periods:
         period = task_periods[task]
         activation_times = range(0, max_time + period, period)
@@ -116,24 +169,36 @@ for task in sorted(intervals.keys()):
                 y + 0.15,
                 y + 0.65,
                 colors='red',
-                linewidth=0.8
+                linewidth=0.7
             )
 
     yticks.append(y + 0.4)
     ylabels.append(task)
     y += 1
 
-ax.set_xlim(left=0)  # Start x-axis at 0
-ax.set_xlabel("Time (after Init)")
+# =========================
+# AXIS FORMATTING
+# =========================
+
+ax.set_xlim(0, max_time)
+ax.set_xlabel("Time (ticks)")
 ax.set_ylabel("Task")
 ax.set_yticks(yticks)
 ax.set_yticklabels(ylabels)
-ax.set_title("Scheduling Timeline")
-ax.grid(True)
+
+# Major ticks
+ax.set_xticks(range(0, max_time + tick_step, tick_step))
+
+# Minor ticks
+ax.set_xticks(range(0, max_time + minor_step, minor_step), minor=True)
+
+# Grid styling
+ax.grid(which='major', axis='x', linestyle='-', linewidth=0.8)
+ax.grid(which='minor', axis='x', linestyle='--', linewidth=0.4, alpha=0.5)
+ax.grid(which='major', axis='y', linestyle='--', alpha=0.4)
+
+ax.set_title("Scheduling Timeline (Rate Monotonic)")
 
 plt.tight_layout()
-plt.savefig(OUTPUT_PNG)
+plt.savefig(OUTPUT_PNG, dpi=300)
 plt.show()
-
-print("\nGenerated file:")
-print(f" - {OUTPUT_PNG}")
