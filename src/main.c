@@ -40,8 +40,8 @@ int main( void )
                    &tB );
 
     xRTTaskCreate( periodic_task, "C", 1024, NULL,
-                   pdMS_TO_TICKS( 700 ),
-                   pdMS_TO_TICKS( 700 ),
+                   pdMS_TO_TICKS( 1000 ),
+                   pdMS_TO_TICKS( 1000 ),
                    pdMS_TO_TICKS( 200  ),
                    &tC );
 

@@ -22,9 +22,9 @@
 // #define configUSE_SCHEDULER    1
 
 #define configUSE_RM              0
-#define configUSE_DM              0
+#define configUSE_DM              1
 #define configUSE_FIFO            0
-#define configUSE_EDF             1
+#define configUSE_EDF             0
 
 #define configMAX_RT_TASKS        10
 
