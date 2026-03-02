@@ -158,19 +158,106 @@ for task in sorted(intervals.keys(), key=lambda t: task_periods.get(t, 9999)):
 print("─" * 50)
 print(f"{'Total CPU Utilization:':<30} {total_util:.3f} ({total_util*100:.1f}%)")
 
-# RM schedulability bound: n*(2^(1/n)-1)
+# =========================
+# SCHEDULABILITY TEST (per policy)
+# =========================
 import math
-n = len(intervals)
+n            = len(intervals)
+policy_upper = scheduling_policy.upper()
+
 if n > 0:
-    rm_bound = n * (2 ** (1/n) - 1)
-    schedulable_label = "[OK]  SCHEDULABLE" if total_util <= rm_bound else "[!!] NOT GUARANTEED"
-    schedulable = "SCHEDULABLE" if total_util <= rm_bound else "NOT GUARANTEED"
-    print(f"{'RM Bound (Liu & Layland):':<30} {rm_bound:.3f}")
-    print(f"{'RM Schedulability:':<30} {'✅ ' + schedulable if total_util <= rm_bound else '⚠️  ' + schedulable}")
+
+    if "EDF" in policy_upper:
+        # Necessary AND sufficient (implicit/constrained deadlines)
+        ok = total_util <= 1.0
+        print("─── Schedulability Test: EDF ──────────────────────────")
+        print("  Theorem (Liu & Layland 1973):")
+        print("  EDF is optimal. Schedulable iff U = sum(Ci/Ti) <= 1")
+        print("  (necessary and sufficient for implicit deadlines)")
+        print(f"\n  U = {total_util:.4f}  {'<= 1.0' if ok else '>  1.0'}")
+        print(f"  Result: {'SCHEDULABLE' if ok else 'DEADLINE MISS POSSIBLE'}")
+        schedulable_label = "[OK]  SCHEDULABLE"          if ok else "[!!] DEADLINE MISS POSSIBLE"
+        schedulable       = "SCHEDULABLE"                if ok else "DEADLINE MISS POSSIBLE"
+
+    elif "DM" in policy_upper:
+        # (1) Necessary:  U <= 1
+        # (2) Sufficient: Hyperbolic bound PROD(Ci/Di + 1) <= 2  (Bini 2003)
+        hyp = 1.0
+        for task in intervals:
+            d = task_deadlines.get(task, task_periods.get(task, 1))
+            w = task_wcet.get(task, 0)
+            hyp *= (w / d + 1)
+        necessary  = total_util <= 1.0
+        sufficient = hyp <= 2.0
+
+        print("─── Schedulability Test: DM ───────────────────────────")
+        print("  (1) Necessary condition:  U = sum(Ci/Ti) <= 1")
+        print(f"      U = {total_util:.4f}  =>  {'PASSED' if necessary else 'FAILED -> definitely NOT schedulable'}")
+        print()
+        print("  (2) Sufficient condition: Hyperbolic bound (Bini 2003)")
+        print("      PROD(Ci/Di + 1) <= 2  (uses deadline Di)")
+        print(f"      PROD = {hyp:.4f}  =>  {'PASSED -> guaranteed schedulable' if sufficient else 'INCONCLUSIVE (may still be schedulable, use exact RTA)'}")
+
+        if not necessary:
+            schedulable = "NOT SCHEDULABLE (overloaded)"
+            schedulable_label = "[!!] NOT SCHEDULABLE"
+        elif sufficient:
+            schedulable = "SCHEDULABLE (sufficient cond.)"
+            schedulable_label = "[OK]  SCHEDULABLE"
+        else:
+            schedulable = "INCONCLUSIVE (use exact RTA)"
+            schedulable_label = "[??] INCONCLUSIVE"
+        print(f"\n  Overall: {schedulable}")
+
+    elif "RM" in policy_upper:
+        # (1) Sufficient: Liu & Layland  U <= n*(2^(1/n) - 1)
+        # (2) Sufficient: Hyperbolic bound  PROD(Ci/Ti + 1) <= 2  (Bini 2003, tighter)
+        ll_bound = n * (2 ** (1 / n) - 1)
+        ll_ok    = total_util <= ll_bound
+
+        hyp = 1.0
+        for task in intervals:
+            p = task_periods.get(task, 1)
+            w = task_wcet.get(task, 0)
+            hyp *= (w / p + 1)
+        hyp_ok = hyp <= 2.0
+
+        print("─── Schedulability Test: RM ───────────────────────────")
+        print("  (1) Liu & Layland bound (sufficient):")
+        print(f"      U <= n*(2^(1/n)-1)  with n={n}  =>  bound = {ll_bound:.4f}")
+        print(f"      U = {total_util:.4f}  =>  {'PASSED -> guaranteed schedulable' if ll_ok else 'FAILED (inconclusive, try hyperbolic)'}")
+        print()
+        print("  (2) Hyperbolic bound (Bini 2003, sufficient, strictly tighter):")
+        print("      PROD(Ci/Ti + 1) <= 2")
+        print(f"      PROD = {hyp:.4f}  =>  {'PASSED -> guaranteed schedulable' if hyp_ok else 'INCONCLUSIVE (may still be schedulable, use exact RTA)'}")
+
+        if ll_ok or hyp_ok:
+            schedulable = "SCHEDULABLE (sufficient cond.)"
+            schedulable_label = "[OK]  SCHEDULABLE"
+        else:
+            schedulable = "INCONCLUSIVE (use exact RTA)"
+            schedulable_label = "[??] INCONCLUSIVE"
+        print(f"\n  Overall: {schedulable}")
+
+    elif "FIFO" in policy_upper:
+        ok = total_util < 1.0
+        print("─── Schedulability Test: FIFO ─────────────────────────")
+        print("  FIFO is not a real-time policy — no deadline guarantee.")
+        print(f"  U = {total_util:.4f}  =>  {'No overload' if ok else 'OVERLOADED (U >= 1)'}")
+        schedulable       = "NO RT GUARANTEE"
+        schedulable_label = "[--] NO RT GUARANTEE"
+
+    else:
+        ok = total_util <= 1.0
+        print("─── Schedulability Test: Unknown policy ───────────────")
+        print("  Applying necessary condition only: U <= 1")
+        print(f"  U = {total_util:.4f}  =>  {'PASSED' if ok else 'FAILED (overloaded)'}")
+        schedulable       = "UNKNOWN POLICY"
+        schedulable_label = "[??] UNKNOWN POLICY"
+
 else:
-    rm_bound = 1.0
     schedulable_label = "[!!] NO TASKS"
-    schedulable = "NO TASKS"
+    schedulable       = "NO TASKS"
 
 print("\n─── Execution Slices per Task ─────────────────────────")
 total_exec = defaultdict(int)

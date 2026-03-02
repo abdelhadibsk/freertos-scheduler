@@ -8877,7 +8877,7 @@ void vRTJobRelease( TaskHandle_t xTask, TickType_t xNow )
     TCB_t * pxTCB = ( TCB_t * ) xTask;
 
     pxTCB->xRT.absolute_deadline = xNow + pxTCB->xRT.deadline;
-    pxTCB->xRT.next_release     += pxTCB->xRT.period;
+    pxTCB->xRT.next_release     += pxTCB->xRT.period;   
     pxTCB->xRT.release_order     = uxGlobalReleaseCounter++;
 }
 

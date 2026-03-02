@@ -96,6 +96,14 @@ void vApplicationSchedulerTickHook( void )
             }
                 
         }
+        #if (configUSE_EDF == 1)
+        /* For EDF, we need to update absolute_deadline on every release, even if the task is not ready, to ensure correct priority ranking. 
+         * This is handled inside vRTJobRelease, which updates absolute_deadline based on the new job's parameters. */
+        
+         // we should add a function that updates absolute_deadline for all tasks on every tick,
+         
+        
+        #endif
     }
 
     if( xHigherPriorityTaskWoken == pdTRUE )

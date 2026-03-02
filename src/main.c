@@ -28,21 +28,21 @@ int main( void )
      * No need to pass parameters to the task function —
      * everything is stored inside the TCB via xRTTaskCreate. */
     xRTTaskCreate( periodic_task, "A", 1024, NULL,
-                   pdMS_TO_TICKS( 100 ),   /* period   */
-                   pdMS_TO_TICKS( 100 ),   /* deadline */
-                   pdMS_TO_TICKS( 20  ),   /* wcet     */
+                   pdMS_TO_TICKS( 400 ),   /* period   */
+                   pdMS_TO_TICKS( 400 ),   /* deadline */
+                   pdMS_TO_TICKS( 100  ),   /* wcet     */
                    &tA );
 
     xRTTaskCreate( periodic_task, "B", 1024, NULL,
-                   pdMS_TO_TICKS( 200 ),
-                   pdMS_TO_TICKS( 200 ),
-                   pdMS_TO_TICKS( 40  ),
+                   pdMS_TO_TICKS( 500 ),
+                   pdMS_TO_TICKS( 500 ),
+                   pdMS_TO_TICKS( 200  ),
                    &tB );
 
     xRTTaskCreate( periodic_task, "C", 1024, NULL,
-                   pdMS_TO_TICKS( 400 ),
-                   pdMS_TO_TICKS( 400 ),
-                   pdMS_TO_TICKS( 60  ),
+                   pdMS_TO_TICKS( 700 ),
+                   pdMS_TO_TICKS( 700 ),
+                   pdMS_TO_TICKS( 200  ),
                    &tC );
 
     /* Print registered task info using helper API */
