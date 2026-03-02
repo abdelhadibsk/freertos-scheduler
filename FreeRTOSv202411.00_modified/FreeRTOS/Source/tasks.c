@@ -1762,8 +1762,7 @@ static void prvAddNewTaskToReadyList( TCB_t * pxNewTCB ) PRIVILEGED_FUNCTION;
         BaseType_t xReturn;
 
         // let's suppose we have a function that calculates the priority of a task, it has as input the list of tasks and their priorities, and it returns the priority
-        // UBaseType_t Priority_calculator(TaskFunction_t pxTaskCode, 
-        // uxPriority = 
+        
 
         traceENTER_xTaskCreate( pxTaskCode, pcName, uxStackDepth, pvParameters, uxPriority, pxCreatedTask );
         

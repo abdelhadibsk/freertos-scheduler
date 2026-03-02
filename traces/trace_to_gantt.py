@@ -141,7 +141,7 @@ def get_job_index(task, slice_start):
 # CPU UTILIZATION STATS
 # =========================
 print("\n╔══════════════════════════════════════════════════════╗")
-print("║           SCHEDULING TRACE ANALYZER                 ║")
+print("║           SCHEDULING TRACE ANALYZER                  ║")
 print("╚══════════════════════════════════════════════════════╝\n")
 
 print("─── Task Parameters ───────────────────────────────────")
@@ -215,7 +215,7 @@ for task in sorted(intervals.keys(), key=lambda t: task_periods.get(t, 9999)):
 # ASCII GANTT
 # =========================
 print("\n\n╔══════════════════════════════════════════════════════╗")
-print("║                ASCII GANTT CHART                    ║")
+print("║                ASCII GANTT CHART                     ║")
 print("╚══════════════════════════════════════════════════════╝\n")
 for task in sorted(intervals.keys(), key=lambda t: task_periods.get(t, 9999)):
     for start, dur in intervals[task]:
