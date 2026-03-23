@@ -1,172 +1,141 @@
+
 === Execution ===
 MAIN START
 Tasks created and registered:
-  Task A: period=400  deadline=400  wcet=100
-  Task B: period=500  deadline=500  wcet=200
-  Task C: period=1000  deadline=1000  wcet=200
-Policy: Deadline Monotonic (DM)
+  Task A: period=400  deadline=400  execution_time=100
+  Task B: period=500  deadline=500  execution_time=200
+  Task C: period=1000  deadline=1000  execution_time=200
+Policy: Earliest Deadline First (EDF)
 Starting scheduler
 [IN ] IDLE at 0
 [OUT] IDLE at 1
 [IN ] A at 1
 [OUT] A at 2
 [IN ] A at 2
-[START] A  tick=3  wcet=100
-[END  ] A  tick=103  exec=100
-[OUT] A at 103
-[IN ] B at 103
-[START] B  tick=104  wcet=200
-[END  ] B  tick=304  exec=200
-[OUT] B at 304
-[IN ] C at 304
-[START] C  tick=305  wcet=200
-[OUT] C at 400
-[IN ] A at 400
-[START] A  tick=400  wcet=100
-[END  ] A  tick=501  exec=100
-[OUT] A at 501
-[IN ] B at 501
-[START] B  tick=502  wcet=200
-[END  ] B  tick=703  exec=200
-[OUT] B at 703
-[IN ] C at 703
-[OUT] C at 800
-[IN ] A at 800
-[START] A  tick=800  wcet=100
-[END  ] A  tick=901  exec=100
-[OUT] A at 901
-[IN ] C at 901
-[END  ] C  tick=909  exec=200
-[OUT] C at 909
-[IN ] IDLE at 909
+[START] A  tick=3  execution_time=100
+[END  ] A  tick=104  exec=100
+[OUT] A at 104
+[IN ] B at 104
+[OUT] B at 105
+[IN ] B at 105
+[START] B  tick=106  execution_time=200
+[END  ] B  tick=307  exec=200
+[OUT] B at 308
+[IN ] C at 308
+[OUT] C at 309
+[IN ] C at 309
+[START] C  tick=310  execution_time=200
+[END  ] C  tick=511  exec=200
+[OUT] C at 511
+[IN ] A at 511
+[OUT] A at 512
+[IN ] A at 512
+[START] A  tick=513  execution_time=100
+[END  ] A  tick=614  exec=100
+[OUT] A at 614
+[IN ] B at 614
+[OUT] B at 615
+[IN ] B at 615
+[START] B  tick=616  execution_time=200
+[END  ] B  tick=817  exec=200
+[OUT] B at 819
+[IN ] A at 819
+[OUT] A at 819
+[IN ] A at 819
+[START] A  tick=820  execution_time=100
+[END  ] A  tick=922  exec=100
+[OUT] A at 923
+[IN ] IDLE at 923
+[OUT] IDLE at 924
+[IN ] IDLE at 924
 [OUT] IDLE at 1000
 [IN ] B at 1000
-[START] B  tick=1000  wcet=200
-[OUT] B at 1200
-[IN ] A at 1200
-[START] A  tick=1200  wcet=100
-[END  ] A  tick=1302  exec=100
-[OUT] A at 1302
-[IN ] B at 1302
-[END  ] B  tick=1303  exec=200
-[OUT] B at 1304
-[IN ] C at 1304
-[START] C  tick=1305  wcet=200
-[OUT] C at 1500
-[IN ] B at 1500
-[START] B  tick=1500  wcet=200
-[OUT] B at 1600
-[IN ] A at 1600
-[START] A  tick=1600  wcet=100
-[END  ] A  tick=1701  exec=100
-[OUT] A at 1701
-[IN ] B at 1701
-[END  ] B  tick=1802  exec=200
-[OUT] B at 1802
-[IN ] C at 1802
-[END  ] C  tick=1807  exec=200
-[OUT] C at 1807
-[IN ] IDLE at 1807
+[OUT] B at 1001
+[IN ] B at 1001
+[START] B  tick=1002  execution_time=200
+[END  ] B  tick=1203  exec=200
+[OUT] B at 1203
+[IN ] A at 1203
+[OUT] A at 1204
+[IN ] A at 1204
+[START] A  tick=1205  execution_time=100
+[END  ] A  tick=1307  exec=100
+[OUT] A at 1308
+[IN ] C at 1308
+[OUT] C at 1309
+[IN ] C at 1309
+[START] C  tick=1310  execution_time=200
+[END  ] C  tick=1511  exec=200
+[OUT] C at 1512
+[IN ] B at 1512
+[OUT] B at 1513
+[IN ] B at 1513
+[START] B  tick=1514  execution_time=200
+[END  ] B  tick=1716  exec=200
+[OUT] B at 1716
+[IN ] A at 1716
+[OUT] A at 1717
+[IN ] A at 1717
+[START] A  tick=1718  execution_time=100
+[END  ] A  tick=1820  exec=100
+[OUT] A at 1820
+[IN ] IDLE at 1820
+[OUT] IDLE at 1821
+[IN ] IDLE at 1821
 [OUT] IDLE at 2000
 [IN ] A at 2000
-[START] A  tick=2001  wcet=100
+[OUT] A at 2001
+[IN ] A at 2001
+[START] A  tick=2001  execution_time=100
 [END  ] A  tick=2102  exec=100
 [OUT] A at 2102
 [IN ] B at 2102
-[START] B  tick=2103  wcet=200
-[END  ] B  tick=2304  exec=200
-[OUT] B at 2304
-[IN ] C at 2304
-[START] C  tick=2305  wcet=200
-[OUT] C at 2400
-[IN ] A at 2400
-[START] A  tick=2401  wcet=100
-[END  ] A  tick=2501  exec=100
-[OUT] A at 2501
-[IN ] B at 2501
-[START] B  tick=2502  wcet=200
-[END  ] B  tick=2702  exec=200
-[OUT] B at 2702
-[IN ] C at 2702
-[OUT] C at 2800
-[IN ] A at 2800
-[START] A  tick=2800  wcet=100
-[END  ] A  tick=2901  exec=100
-[OUT] A at 2901
-[IN ] C at 2901
-[END  ] C  tick=2908  exec=200
-[OUT] C at 2908
-[IN ] IDLE at 2908
+[OUT] B at 2103
+[IN ] B at 2103
+[START] B  tick=2104  execution_time=200
+[END  ] B  tick=2305  exec=200
+[OUT] B at 2306
+[IN ] C at 2306
+[OUT] C at 2307
+[IN ] C at 2307
+[START] C  tick=2308  execution_time=200
+[END  ] C  tick=2510  exec=200
+[OUT] C at 2511
+[IN ] A at 2511
+[OUT] A at 2512
+[IN ] A at 2512
+[START] A  tick=2513  execution_time=100
+[END  ] A  tick=2614  exec=100
+[OUT] A at 2614
+[IN ] B at 2614
+[OUT] B at 2615
+[IN ] B at 2615
+[START] B  tick=2616  execution_time=200
+[END  ] B  tick=2818  exec=200
+[OUT] B at 2834
+[IN ] A at 2834
+[OUT] A at 2835
+[IN ] A at 2835
+[START] A  tick=2836  execution_time=100
+[END  ] A  tick=2937  exec=100
+[OUT] A at 2938
+[IN ] IDLE at 2938
+[OUT] IDLE at 2939
+[IN ] IDLE at 2939
 [OUT] IDLE at 3000
 [IN ] B at 3000
-[START] B  tick=3000  wcet=200
-[OUT] B at 3200
-[IN ] A at 3200
-[START] A  tick=3201  wcet=100
-[END  ] A  tick=3301  exec=100
-[OUT] A at 3302
-[IN ] B at 3302
-[END  ] B  tick=3302  exec=200
-[OUT] B at 3303
-[IN ] C at 3303
-[START] C  tick=3304  wcet=200
-[OUT] C at 3500
-[IN ] B at 3500
-[START] B  tick=3501  wcet=200
-[OUT] B at 3600
-[IN ] A at 3600
-[START] A  tick=3601  wcet=100
-[END  ] A  tick=3701  exec=100
-[OUT] A at 3702
-[IN ] B at 3702
-[END  ] B  tick=3802  exec=200
-[OUT] B at 3802
-[IN ] C at 3802
-[END  ] C  tick=3806  exec=200
-[OUT] C at 3806
-[IN ] IDLE at 3806
-[OUT] IDLE at 4000
-[IN ] A at 4000
-[START] A  tick=4000  wcet=100
-[END  ] A  tick=4101  exec=100
-[OUT] A at 4101
-[IN ] B at 4101
-[START] B  tick=4102  wcet=200
-[END  ] B  tick=4302  exec=200
-[OUT] B at 4302
-[IN ] C at 4302
-[START] C  tick=4303  wcet=200
-[OUT] C at 4400
-[IN ] A at 4400
-[START] A  tick=4400  wcet=100
-[END  ] A  tick=4501  exec=100
-[OUT] A at 4501
-[IN ] B at 4501
-[START] B  tick=4502  wcet=200
-[END  ] B  tick=4702  exec=200
-[OUT] B at 4703
-[IN ] C at 4703
-[OUT] C at 4800
-[IN ] A at 4800
-[START] A  tick=4801  wcet=100
-[END  ] A  tick=4901  exec=100
-[OUT] A at 4901
-[IN ] C at 4901
-[END  ] C  tick=4907  exec=200
-[OUT] C at 4908
-[IN ] IDLE at 4908
-[OUT] IDLE at 5000
-[IN ] B at 5000
-[START] B  tick=5001  wcet=200
-[OUT] B at 5200
-[IN ] A at 5200
-[START] A  tick=5200  wcet=100
-[END  ] A  tick=5301  exec=100
-[OUT] A at 5301
-[IN ] B at 5301
-[END  ] B  tick=5302  exec=200
-[OUT] B at 5302
-[IN ] C at 5302
-[START] C  tick=5303  wcet=200
-[OUT] C at 5500
-[IN ] B at 5500
+[OUT] B at 3001
+[IN ] B at 3001
+[START] B  tick=3001  execution_time=200
+[END  ] B  tick=3202  exec=200
+[OUT] B at 3202
+[IN ] A at 3202
+[OUT] A at 3203
+[IN ] A at 3203
+[START] A  tick=3204  execution_time=100
+[END  ] A  tick=3305  exec=100
+[OUT] A at 3305
+[IN ] C at 3305
+[OUT] C at 3306
+[IN ] C at 3306
+[START] C  tick=3307  execution_time=200

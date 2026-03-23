@@ -27,7 +27,7 @@ BaseType_t xRTTaskCreate(
     void *                 pvParameters,
     TickType_t             period,
     TickType_t             deadline,
-    TickType_t             wcet,
+    TickType_t             execution_time,
     TaskHandle_t *         pxCreatedTask )
 {
     BaseType_t xResult;
@@ -46,7 +46,9 @@ BaseType_t xRTTaskCreate(
     if( xResult == pdPASS ) 
     {
         /* Register RT params — implemented in tasks.c, has TCB access */
-        vApplicationRTTaskRegister( *pxCreatedTask, period, deadline, wcet );
+        vApplicationRTTaskRegister( *pxCreatedTask, period, deadline, execution_time );
+
+        
 
         /* Suspend — TickHook controls first release */
         vTaskSuspend( *pxCreatedTask );

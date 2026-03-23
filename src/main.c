@@ -30,7 +30,7 @@ int main( void )
     xRTTaskCreate( periodic_task, "A", 1024, NULL,
                    pdMS_TO_TICKS( 400 ),   /* period   */
                    pdMS_TO_TICKS( 400 ),   /* deadline */
-                   pdMS_TO_TICKS( 100  ),   /* wcet     */
+                   pdMS_TO_TICKS( 100  ),   /* execution time */
                    &tA );
 
     xRTTaskCreate( periodic_task, "B", 1024, NULL,
@@ -50,11 +50,11 @@ int main( void )
     for( UBaseType_t i = 0; i < uxRTGetTaskCount(); i++ )
     {
         TaskHandle_t h = xRTGetTaskByIndex( i );
-        printf( "  Task %s: period=%lu  deadline=%lu  wcet=%lu\n",
+        printf( "  Task %s: period=%lu  deadline=%lu  execution_time=%lu\n",
                 pcTaskGetName( h ),
                 ( unsigned long ) xRTGetTaskPeriod( h ),
                 ( unsigned long ) xRTGetTaskDeadline( h ),
-                ( unsigned long ) xRTGetTaskWCET( h ) );
+                ( unsigned long ) xRTGetTaskExecutionTime( h ) );
     }
 
     /* Active policy shown at startup */
@@ -84,7 +84,7 @@ int main( void )
  * the TCB via the helper API using the current task handle.
  *
  * Pattern:
- *   1. Do work (busy wait for wcet duration)
+ *   1. Do work (busy wait for execution time duration)
  *   2. Print job info
  *   3. Suspend — TickHook will release next job
  * ========================================================= */
@@ -95,18 +95,18 @@ void periodic_task( void *pvParameters )
     for( ;; )
     {
         TaskHandle_t self    = xTaskGetCurrentTaskHandle();
-        TickType_t   wcet    = xRTGetTaskWCET( self );
+        TickType_t   execution_time = xRTGetTaskExecutionTime( self );
         TickType_t   elapsed = 0;
         TickType_t   slice_start;
 
-        printf( "[START] %s  tick=%lu  wcet=%lu\n",
+        printf( "[START] %s  tick=%lu  execution_time=%lu\n",
                 pcTaskGetName( self ),
                 ( unsigned long ) xTaskGetTickCount(),
-                ( unsigned long ) wcet );
+                ( unsigned long ) execution_time );
 
         /* Exécute par tranches — accumule seulement le temps CPU réel.
          * Si préemptée entre deux tranches, le temps perdu n'est pas compté. */
-        while( elapsed < wcet )
+        while( elapsed < execution_time )
         {
             slice_start = xTaskGetTickCount();
 

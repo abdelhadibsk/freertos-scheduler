@@ -8790,10 +8790,10 @@ TickType_t xRTGetTaskPeriod( TaskHandle_t xTask )
     return val;
 }
 
-TickType_t xRTGetTaskWCET( TaskHandle_t xTask )
+TickType_t xRTGetTaskExecutionTime( TaskHandle_t xTask )
 {
     taskENTER_CRITICAL();
-    TickType_t val = ( ( TCB_t * ) xTask )->xRT.wcet;
+    TickType_t val = ( ( TCB_t * ) xTask )->xRT.execution_time;
     taskEXIT_CRITICAL();
     return val;
 }
@@ -8890,7 +8890,7 @@ void vApplicationRTTaskRegister(
     TaskHandle_t xTask,
     TickType_t   period,
     TickType_t   deadline,
-    TickType_t   wcet )
+    TickType_t   execution_time )
 {
     TCB_t * pxTCB = ( TCB_t * ) xTask;
 
@@ -8903,7 +8903,7 @@ void vApplicationRTTaskRegister(
 
     pxTCB->xRT.period            = period;
     pxTCB->xRT.deadline          = deadline;
-    pxTCB->xRT.wcet              = wcet;
+    pxTCB->xRT.execution_time    = execution_time;
     pxTCB->xRT.next_release      = xTaskGetTickCount();
     pxTCB->xRT.absolute_deadline = 0;
     pxTCB->xRT.release_order     = 0;

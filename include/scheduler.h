@@ -22,9 +22,9 @@
 // #define configUSE_SCHEDULER    1
 
 #define configUSE_RM              0
-#define configUSE_DM              1
+#define configUSE_DM              0
 #define configUSE_FIFO            0
-#define configUSE_EDF             0
+#define configUSE_EDF             1
 
 #define configMAX_RT_TASKS        10
 
@@ -42,7 +42,7 @@ typedef struct
 {
     TickType_t  period;
     TickType_t  deadline;
-    TickType_t  wcet;
+    TickType_t  execution_time;
 
     TickType_t  next_release;
     TickType_t  absolute_deadline;
@@ -63,7 +63,7 @@ BaseType_t xRTTaskCreate(
     void *                 pvParameters,
     TickType_t             period,
     TickType_t             deadline,
-    TickType_t             wcet,
+    TickType_t             execution_time,
     TaskHandle_t *         pxCreatedTask
 );
 
@@ -71,7 +71,7 @@ void vApplicationRTTaskRegister(
     TaskHandle_t xTask,
     TickType_t   period,
     TickType_t   deadline,
-    TickType_t   wcet
+    TickType_t   execution_time
 );
 
 void vApplicationSchedulerTickHook( void );
@@ -95,7 +95,7 @@ extern TaskHandle_t xRTGetTaskByIndex( UBaseType_t index );
 /* RT parameter getters — implemented in tasks.c */
 extern TickType_t   xRTGetTaskPeriod( TaskHandle_t xTask );
 extern TickType_t   xRTGetTaskDeadline( TaskHandle_t xTask );
-extern TickType_t   xRTGetTaskWCET( TaskHandle_t xTask );
+extern TickType_t   xRTGetTaskExecutionTime( TaskHandle_t xTask );
 extern TickType_t   xRTGetTaskAbsoluteDeadline( TaskHandle_t xTask );
 extern UBaseType_t  uxRTGetTaskReleaseOrder( TaskHandle_t xTask );
 

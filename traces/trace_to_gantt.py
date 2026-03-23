@@ -14,7 +14,7 @@ IGNORE_TASKS = {"Init", "IDLE"}
 # =========================
 # REGEX PATTERNS
 # =========================
-TASK_INFO_RE  = re.compile(r"Task (\w+):\s+period=(\d+)\s+deadline=(\d+)\s+wcet=(\d+)")
+TASK_INFO_RE  = re.compile(r"Task (\w+):\s+period=(\d+)\s+deadline=(\d+)\s+execution_time=(\d+)")
 START_EXEC_RE = re.compile(r"\[START\]\s+(\w+)\s+tick=(\d+)")
 END_EXEC_RE   = re.compile(r"\[END\s*\]\s+(\w+)\s+tick=(\d+)")
 OUT_RE        = re.compile(r"\[OUT\]\s+(\w+)\s+at\s+(\d+)")
@@ -26,7 +26,7 @@ POLICY_RE     = re.compile(r"Policy:\s*(.+)")
 # =========================
 task_periods      = {}
 task_deadlines    = {}
-task_wcet         = {}
+task_execution_time = {}
 intervals         = {}
 exec_start_times  = {}
 preempted_tasks   = set()
@@ -44,7 +44,7 @@ with open(LOG_FILE, "r") as f:
             name = task_info.group(1)
             task_periods[name]   = int(task_info.group(2))
             task_deadlines[name] = int(task_info.group(3))
-            task_wcet[name]      = int(task_info.group(4))
+            task_execution_time[name]      = int(task_info.group(4))
             continue
 
         policy_match = POLICY_RE.search(line)
@@ -137,13 +137,13 @@ print(f"\n  Policy: {scheduling_policy}\n")
 # TASK PARAMETERS
 # =========================
 print("─── Task Parameters ───────────────────────────────────")
-print(f"{'Task':<8} {'Period':>8} {'Deadline':>10} {'WCET':>6}  {'Ui=Ci/Ti':>10}")
+print(f"{'Task':<8} {'Period':>8} {'Deadline':>10} {'Execution Time':>12}  {'Ui=Ci/Ti':>10}")
 print("─" * 52)
 total_util = 0.0
 for task in sorted(intervals.keys(), key=lambda t: task_periods.get(t, 9999)):
     p  = task_periods.get(task, 0)
     d  = task_deadlines.get(task, 0)
-    w  = task_wcet.get(task, 0)
+    w  = task_execution_time.get(task, 0)
     ui = w / p if p > 0 else 0
     total_util += ui
     print(f"{task:<8} {p:>8} {d:>10} {w:>6}  {ui:>10.4f}")
@@ -177,7 +177,7 @@ elif "DM" in policy_upper:
     hyp = 1.0
     for task in intervals:
         d = task_deadlines.get(task, task_periods.get(task, 1))
-        w = task_wcet.get(task, 0)
+        w = task_execution_time.get(task, 0)
         hyp *= (w / d + 1)
     necessary  = total_util <= 1.0
     sufficient = hyp <= 2.0
@@ -210,7 +210,7 @@ elif "RM" in policy_upper:
     hyp = 1.0
     for task in intervals:
         p = task_periods.get(task, 1)
-        w = task_wcet.get(task, 0)
+        w = task_execution_time.get(task, 0)
         hyp *= (w / p + 1)
     hyp_ok = hyp <= 2.0
 
@@ -259,7 +259,7 @@ for task in sorted(intervals.keys(), key=lambda t: task_periods.get(t, 9999)):
         j = get_job_index(task, start)
         print(f"    J{j} slice {i:<3}: [{start:>6} ──── {start+dur:>6}]  (dur={dur})")
         total_exec[task] += dur
-    w = task_wcet.get(task, 1)
+    w = task_execution_time.get(task, 1)
     job_counts[task] = round(total_exec[task] / w) if w > 0 else 0
     print(f"    => Total exec: {total_exec[task]}  |  Jobs completed: {job_counts[task]}")
 
@@ -267,11 +267,11 @@ for task in sorted(intervals.keys(), key=lambda t: task_periods.get(t, 9999)):
 # RESPONSE TIMES
 # =========================
 print("\n─── Response Times ────────────────────────────────────")
-print(f"{'Task':<8} {'Avg Resp':>10} {'Max Resp':>10} {'WCET':>6} {'Deadline':>10}  Status")
+print(f"{'Task':<8} {'Avg Resp':>10} {'Max Resp':>10} {'Execution Time':>12} {'Deadline':>10}  Status")
 print("─" * 60)
 for task in sorted(intervals.keys(), key=lambda t: task_periods.get(t, 9999)):
     d = task_deadlines.get(task, 0)
-    w = task_wcet.get(task, 0)
+    w = task_execution_time.get(task, 0)
     slices = intervals[task]
     jobs = []
     acc = 0
@@ -415,7 +415,7 @@ def on_hover(event):
                     annot.set_text(
                         f"{task}  J{j}\n"
                         f"start={start}  end={start+dur}\n"
-                        f"dur={dur}  wcet={task_wcet.get(task,'?')}"
+                        f"dur={dur}  execution_time={task_execution_time.get(task,'?')}"
                     )
                     annot.set_visible(True)
                     fig.canvas.draw_idle()
