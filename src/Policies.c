@@ -186,13 +186,14 @@ void vEDF_UpdatePriorities( void )
     {
         TaskHandle_t xTaskI = xRTGetTaskByIndex( i );
 
-        /* Non-ready tasks always receive lowest priority */
+        /* Non-ready tasks always receive lowest priority 
         if( xRTIsTaskReady( xTaskI ) == pdFALSE )
         {
             ranks[ i ] = n;
             continue;
         }
-
+        */
+       
         TickType_t xDeadlineI = xRTGetTaskAbsoluteDeadline( xTaskI );
         UBaseType_t rank = 0U;
 
