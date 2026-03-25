@@ -14,7 +14,7 @@ TRACE_SCRIPT = trace_to_gantt.py
 # =========================================================
 # FreeRTOS paths
 # =========================================================
-FREERTOS_ROOT = C:/Users/bensi/WorkSpace_hadi/test2/FreeRTOSv202411.00_modified
+FREERTOS_ROOT = C:/Users/bensi/WorkSpace_hadi/test2/FreeRTOSv10.3.1
 FREERTOS_SRC = $(FREERTOS_ROOT)/FreeRTOS/Source
 FREERTOS_PORT = $(FREERTOS_SRC)/portable/MSVC-MingW
 FREERTOS_MEMMANG = $(FREERTOS_SRC)/portable/MemMang

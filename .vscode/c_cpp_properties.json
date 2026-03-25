@@ -5,9 +5,9 @@
       "includePath": [
         "${workspaceFolder}/**",
         "${workspaceFolder}/include",
-        "${FREERTOS_PATH_M}/FreeRTOS/Source/include",
-        "${FREERTOS_PATH_M}/FreeRTOS/Source",
-        "${FREERTOS_PATH_M}/FreeRTOS/Source/portable/MSVC-MingW",
+        "${FREERTOS_STM}/FreeRTOS/Source/include",
+        "${FREERTOS_STM}/FreeRTOS/Source",
+        "${FREERTOS_STM}/FreeRTOS/Source/portable/MSVC-MingW",
         "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um",
         "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared",
         "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/winrt"
@@ -15,8 +15,8 @@
       "browse": {
         "path": [
           "${workspaceFolder}/include",
-          "${FREERTOS_PATH_M}/FreeRTOS/Source",
-          "${FREERTOS_PATH_M}/FreeRTOS/Source/portable/MSVC-MingW",
+          "${FREERTOS_STM}/FreeRTOS/Source",
+          "${FREERTOS_STM}/FreeRTOS/Source/portable/MSVC-MingW",
           "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um",
           "C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared"
         ],
