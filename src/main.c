@@ -99,7 +99,7 @@ void periodic_task( void *pvParameters )
         TickType_t   elapsed = 0;
         TickType_t   slice_start;
 
-        printf( "[START] %s  tick=%lu  execution_time=%lu\n",
+        printf( "[START] %s  tick=%lu  execution_time = %lu\n",
                 pcTaskGetName( self ),
                 ( unsigned long ) xTaskGetTickCount(),
                 ( unsigned long ) execution_time );

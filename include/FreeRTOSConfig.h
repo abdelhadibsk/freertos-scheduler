@@ -12,9 +12,7 @@
 
 #define configUSE_SCHEDULER 1
 
-#define FIFO_AlGORITHM      0
-#define RM_ALGORITHM        0
-#define DM_ALGORITHM        0
+#define INCLUDE_xTaskGetCurrentTaskHandle 1   // to use xTaskGetCurrentTaskHandle in MyTaskSwitchedIn/Out
 
 /* periodique tasks */
 #define configUSE_PERIODIC_TASKS              1   // to enable regestering the parameters of periodic tasks in scheduler_register_task
