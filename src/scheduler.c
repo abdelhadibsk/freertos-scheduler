@@ -48,8 +48,6 @@ BaseType_t xRTTaskCreate(
         /* Register RT params — implemented in tasks.c, has TCB access */
         vApplicationRTTaskRegister( *pxCreatedTask, period, deadline, execution_time );
 
-        
-
         /* Suspend — TickHook controls first release */
         vTaskSuspend( *pxCreatedTask );
     }
@@ -68,59 +66,42 @@ BaseType_t xRTTaskCreate(
 void vApplicationSchedulerTickHook( void )
 {
     UBaseType_t i;
-    BaseType_t  xHigherPriorityTaskWoken = pdFALSE;
     TickType_t  xNow = xTaskGetTickCountFromISR();
+    UBaseType_t n = uxRTGetTaskCount();
+    
+    // printf("TickHook: xNow=%lu n=%lu\n", (unsigned long)xNow, (unsigned long)n);
 
-    UBaseType_t n = uxRTGetTaskCount();   /* helper in tasks.c */
-
-    /* Loop through all registered tasks and release those whose next_release has arrived.
-     * Note: we could optimize this by keeping a sorted list of next_release times, 
-     * but for simplicity we just loop through all tasks every tick. */
     for( i = 0; i < n; i++ )
     {
-        TaskHandle_t xTask = xRTGetTaskByIndex( i );   /* helper in tasks.c */
-
-        /* Read next_release — we need a local ISR-safe read.
-         * Since we are in ISR context we use a direct field access
-         * via a dedicated helper (no critical section needed inside
-         * ISR as tick interrupt is the only writer of next_release). */
+        TaskHandle_t xTask = xRTGetTaskByIndex( i );
         TickType_t next_release = xRTGetNextRelease( xTask );
+        eTaskState state = eTaskGetState( xTask );
+
+        // printf("  Task %s: next_release=%lu state=%d\n",
+        //        pcTaskGetName(xTask),
+        //        (unsigned long)next_release,
+        //        (int)state);
 
         if( xNow >= next_release )
         {
-            /* New job — update RT fields via ISR-safe helper */
-            vRTJobRelease( xTask, xNow );   /* helper in tasks.c */
+            vRTJobRelease( xTask, xNow );
             
-            if( eTaskGetState( xTask ) == eSuspended )  
+            if( state == eSuspended )  
             {
-                xTaskResumeFromISR( xTask );
-                xHigherPriorityTaskWoken = pdTRUE;
+                BaseType_t r = xTaskResumeFromISR( xTask );
+                // printf("  xTaskResumeFromISR returned %ld\n", (long)r);
             }
-                
         }
-        #if (configUSE_EDF == 1)
-        /* For EDF, we need to update absolute_deadline on every release, even if the task is not ready, to ensure correct priority ranking. 
-         * This is handled inside vRTJobRelease, which updates absolute_deadline based on the new job's parameters. */
-        
-        // we should add a function that updates absolute_deadline for all tasks on every tick,
-         
-        
-        #endif
-    }
-
-    if( xHigherPriorityTaskWoken == pdTRUE )
-    {
-        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
     }
 }
-
 /* =========================================================
  * Hook 3 — vApplicationSchedulerUpdatePriorities
  * Called by vTaskSwitchContext() before highest priority selection.
  * Already inside a critical section — no extra protection needed.
  * ========================================================= */
 void vApplicationSchedulerUpdatePriorities( void )
-{
+{   
+    // printf( "[PRIORITY UPDATE] Tick=%lu\n", ( unsigned long ) xTaskGetTickCount() );
 #if   ( configUSE_RM   == 1 )
     vRM_UpdatePriorities();
 #elif ( configUSE_DM   == 1 )

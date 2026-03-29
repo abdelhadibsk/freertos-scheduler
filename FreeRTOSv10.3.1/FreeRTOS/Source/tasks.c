@@ -1961,6 +1961,7 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB )
 					if( pxTCB->uxPriority >= pxCurrentTCB->uxPriority )
 					{
 						xYieldRequired = pdTRUE;
+						xYieldPending = pdTRUE;
 					}
 					else
 					{
@@ -2899,6 +2900,8 @@ BaseType_t xSwitchRequired = pdFALSE;
         #endif
 
 	}
+	// printf("xTaskIncrementTick: xSwitchRequired=%ld xYieldPending=%ld\n", 
+    //    (long)xSwitchRequired, (long)xYieldPending);
 
 	return xSwitchRequired;
 }

@@ -32,9 +32,8 @@
 
 #define configCHECK_FOR_STACK_OVERFLOW  2
 #define configUSE_IDLE_HOOK             0   // to enable vApplicationIdleHook
-#define configUSE_TICK_HOOK             1   // to enable vApplicationTickHook
-
-#define configUSE_TASK_STATE_HOOK       1
+#define configUSE_TICK_HOOK             0   // to enable vApplicationTickHook
+#define configUSE_TASK_STATE_HOOK       0   // to enable vApplicationTaskStateHook
 
 
 

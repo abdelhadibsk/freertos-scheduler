@@ -364,7 +364,8 @@ uint32_t ulSwitchRequired;
 	/* Process the tick itself. */
 	configASSERT( xPortRunning );
 	ulSwitchRequired = ( uint32_t ) xTaskIncrementTick();
-
+	    // printf("prvProcessTickInterrupt: ulSwitchRequired=%lu\n", 
+        //    (unsigned long)ulSwitchRequired);
 	return ulSwitchRequired;
 }
 /*-----------------------------------------------------------*/

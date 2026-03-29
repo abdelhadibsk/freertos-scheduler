@@ -11,117 +11,70 @@ Starting scheduler
 [IN ] A at 1
 [OUT] A at 2
 [IN ] A at 2
-[START] A  tick=3  execution_time=100
-[END  ] A  tick=104  exec=100
-[OUT] A at 106
-[IN ] B at 106
-[START] B  tick=107  execution_time=200
-[OUT] B at 201
-[IN ] A at 201
-[OUT] A at 201
-[IN ] A at 201
-[START] A  tick=202  execution_time=100
-[END  ] A  tick=302  exec=100
-[OUT] A at 309
-[IN ] B at 309
-[OUT] B at 401
-[IN ] A at 401
-[OUT] A at 401
-[IN ] A at 401
-[START] A  tick=402  execution_time=100
-[END  ] A  tick=502  exec=100
-[OUT] A at 502
-[IN ] B at 502
-[END  ] B  tick=516  exec=200
-[OUT] B at 516
-[IN ] C at 516
-[START] C  tick=517  execution_time=600
-[OUT] C at 601
-[IN ] A at 601
-[OUT] A at 601
-[IN ] A at 601
-[START] A  tick=602  execution_time=100
-[END  ] A  tick=702  exec=100
-[OUT] A at 702
-[IN ] C at 702
-[OUT] C at 801
-[IN ] A at 801
-[OUT] A at 802
-[IN ] A at 802
-[START] A  tick=802  execution_time=100
-[END  ] A  tick=903  exec=100
-[OUT] A at 904
-[IN ] C at 904
-[OUT] C at 1001
-[IN ] A at 1001
-[OUT] A at 1002
-[IN ] A at 1002
-[START] A  tick=1002  execution_time=100
-[END  ] A  tick=1103  exec=100
-[OUT] A at 1104
-[IN ] B at 1104
-[START] B  tick=1105  execution_time=200
-[OUT] B at 1201
-[IN ] A at 1201
-[OUT] A at 1202
-[IN ] A at 1202
-[START] A  tick=1203  execution_time=100
-[END  ] A  tick=1303  exec=100
-[OUT] A at 1303
-[IN ] B at 1303
-[OUT] B at 1401
-[IN ] A at 1401
-[OUT] A at 1402
-[IN ] A at 1402
-[START] A  tick=1402  execution_time=100
-[END  ] A  tick=1503  exec=100
-[OUT] A at 1504
-[IN ] B at 1504
-[END  ] B  tick=1509  exec=200
-[OUT] B at 1510
-[IN ] C at 1510
-[OUT] C at 1601
+[START] A  tick=20  execution_time = 100
+[END  ] A  tick=959  exec=100
+[OUT] A at 1489
+[IN ] B at 1489
+[OUT] B at 1490
+[IN ] B at 1490
+[START] B  tick=1524  execution_time = 200
+[OUT] B at 1600
+[IN ] A at 1600
+[OUT] A at 1601
 [IN ] A at 1601
-[OUT] A at 1602
-[IN ] A at 1602
-[START] A  tick=1602  execution_time=100
-[END  ] A  tick=1703  exec=100
-[OUT] A at 1704
-[IN ] B at 1704
-[START] B  tick=1704  execution_time=200
-[OUT] B at 1801
-[IN ] A at 1801
-[OUT] A at 1801
-[IN ] A at 1801
-[START] A  tick=1802  execution_time=100
-[END  ] A  tick=1902  exec=100
-[OUT] A at 1903
-[IN ] B at 1903
-[OUT] B at 2001
-[IN ] A at 2001
-[OUT] A at 2002
-[IN ] A at 2002
-[START] A  tick=2002  execution_time=100
-[END  ] A  tick=2103  exec=100
-[OUT] A at 2103
-[IN ] B at 2103
-[END  ] B  tick=2109  exec=200
-[OUT] B at 2110
-[IN ] C at 2110
-[OUT] C at 2201
-[IN ] A at 2201
-[OUT] A at 2202
-[IN ] A at 2202
-[START] A  tick=2202  execution_time=100
-[END  ] A  tick=2304  exec=100
-[OUT] A at 2305
-[IN ] C at 2305
-[OUT] C at 2401
-[IN ] A at 2401
-[OUT] A at 2402
-[IN ] A at 2402
-[START] A  tick=2402  execution_time=100
-[END  ] A  tick=2503  exec=100
-[OUT] A at 2504
-[IN ] B at 2504
-[START] B  tick=2505  execution_time=200
+[START] A  tick=1618  execution_time = 100
+[END  ] A  tick=2569  exec=100
+[OUT] A at 3106
+[IN ] B at 3106
+[OUT] B at 3107
+[IN ] B at 3107
+[OUT] B at 3200
+[IN ] A at 3200
+[OUT] A at 3201
+[IN ] A at 3201
+[START] A  tick=3218  execution_time = 100
+[END  ] A  tick=4172  exec=100
+[OUT] A at 4725
+[IN ] B at 4725
+[OUT] B at 4726
+[IN ] B at 4726
+[OUT] B at 4800
+[IN ] A at 4800
+[OUT] A at 4801
+[IN ] A at 4801
+[START] A  tick=4818  execution_time = 100
+[END  ] A  tick=5765  exec=100
+[OUT] A at 6325
+[IN ] B at 6325
+[OUT] B at 6326
+[IN ] B at 6326
+[OUT] B at 6400
+[IN ] A at 6400
+[OUT] A at 6401
+[IN ] A at 6401
+[START] A  tick=6417  execution_time = 100
+[END  ] A  tick=7366  exec=100
+[OUT] A at 7920
+[IN ] B at 7920
+[OUT] B at 7921
+[IN ] B at 7921
+[OUT] B at 8000
+[IN ] A at 8000
+[OUT] A at 8001
+[IN ] A at 8001
+[START] A  tick=8018  execution_time = 100
+[END  ] A  tick=8961  exec=100
+[OUT] A at 9518
+[IN ] B at 9518
+[OUT] B at 9519
+[IN ] B at 9519
+[OUT] B at 9600
+[IN ] A at 9600
+[OUT] A at 9601
+[IN ] A at 9601
+[START] A  tick=9618  execution_time = 100
+[END  ] A  tick=10569  exec=100
+[OUT] A at 11138
+[IN ] B at 11138
+[OUT] B at 11139
+[IN ] B at 11139
