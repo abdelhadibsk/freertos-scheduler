@@ -15,6 +15,8 @@ void periodic_task( void *pvParameters );
 void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName );
 void MyTaskSwitchedIn( void );
 void MyTaskSwitchedOut( void );
+void vApplicationTickHook( void );
+void show_specific_task_states(void);
 
 /* =========================================================
  * main
@@ -171,6 +173,7 @@ void MyTaskSwitchedOut( void )
  * xTaskIncrementTick() via the tasks.c modification.
  * This hook is for application-level periodic logging only.
  * ========================================================= */
+/*
 void vApplicationTickHook( void )
 {
     static TickType_t tickCount = 0;
@@ -179,5 +182,52 @@ void vApplicationTickHook( void )
     if( ( tickCount % 100 ) == 0 )
     {
         printf( "[TICK] %lu\n", ( unsigned long ) tickCount );
+    }
+}
+*/
+
+void show_specific_task_states(void)
+{
+    TaskHandle_t tasks[] = {tA, tB, tC};
+    const char* names[] = {"A", "B", "C"};
+    
+    printf("\n--- Specific Task States ---\n");
+    for(int i = 0; i < 3; i++)
+    {
+        if(tasks[i] != NULL)
+        {
+            eTaskState state = eTaskGetState(tasks[i]);
+            const char *state_str;
+            
+            switch(state)
+            {
+                case eRunning:   state_str = "Running"; break;
+                case eReady:     state_str = "Ready"; break;
+                case eBlocked:   state_str = "Blocked"; break;
+                case eSuspended: state_str = "Suspended"; break;
+                case eDeleted:   state_str = "Deleted"; break;
+                default:         state_str = "Unknown"; break;
+            }
+            
+            printf("Task %s: %s\n", names[i], state_str);
+        }
+    }
+    printf("----------------------------\n");
+}
+
+// And update the tick hook to use the simpler version:
+void vApplicationTickHook(void)
+{
+    static TickType_t tickCount = 0;
+    tickCount++;
+    
+    if ((tickCount % 10) == 0)
+    {
+        printf("[TICK] %lu ticks elapsed\n", (unsigned long)tickCount);
+        
+        if ((tickCount % 50) == 0) 
+        {
+            show_specific_task_states();
+        }
     }
 }

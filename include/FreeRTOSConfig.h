@@ -12,8 +12,6 @@
 
 #define configUSE_SCHEDULER 1
 
-#define INCLUDE_xTaskGetCurrentTaskHandle 1   // to use xTaskGetCurrentTaskHandle in MyTaskSwitchedIn/Out
-
 /* periodique tasks */
 #define configUSE_PERIODIC_TASKS              1   // to enable regestering the parameters of periodic tasks in scheduler_register_task
 
@@ -34,7 +32,11 @@
 
 #define configCHECK_FOR_STACK_OVERFLOW  2
 #define configUSE_IDLE_HOOK             0   // to enable vApplicationIdleHook
-#define configUSE_TICK_HOOK             0   // to enable vApplicationTickHook
+#define configUSE_TICK_HOOK             1   // to enable vApplicationTickHook
+
+#define configUSE_TASK_STATE_HOOK       1
+
+
 
 /* ================= TRACE (pour [IN]/[OUT]) ================= */
 
