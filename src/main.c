@@ -29,7 +29,7 @@ int main( void )
     /* Create RT periodic tasks.
      * No need to pass parameters to the task function —
      * everything is stored inside the TCB via xRTTaskCreate. */
-    xRTTaskCreate( periodic_task, "A", 1024, NULL,
+        xRTTaskCreate( periodic_task, "A", 1024, NULL,
                    pdMS_TO_TICKS( 200 ),   /* period   */
                    pdMS_TO_TICKS( 200 ),   /* deadline */
                    pdMS_TO_TICKS( 100  ),   /* execution time */
