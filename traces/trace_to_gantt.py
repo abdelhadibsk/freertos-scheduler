@@ -14,24 +14,21 @@ IGNORE_TASKS = {"Init", "IDLE"}
 # =========================
 # REGEX PATTERNS
 # =========================
-TASK_INFO_RE  = re.compile(r"Task (\w+):\s+period=(\d+)\s+deadline=(\d+)\s+execution_time=(\d+)")
-START_EXEC_RE = re.compile(r"\[START\]\s+(\w+)\s+tick=(\d+)")
-END_EXEC_RE   = re.compile(r"\[END\s*\]\s+(\w+)\s+tick=(\d+)")
-OUT_RE        = re.compile(r"\[OUT\]\s+(\w+)\s+at\s+(\d+)")
-IN_RE         = re.compile(r"\[IN\s*\]\s+(\w+)\s+at\s+(\d+)")
-POLICY_RE     = re.compile(r"Policy:\s*(.+)")
+TASK_INFO_RE = re.compile(r"Task (\w+):\s+period=(\d+)\s+deadline=(\d+)\s+execution_time=(\d+)")
+OUT_RE       = re.compile(r"\[OUT\]\s+(\w+)\s+at\s+(\d+)")
+IN_RE        = re.compile(r"\[IN\s*\]\s+(\w+)\s+at\s+(\d+)")
+POLICY_RE    = re.compile(r"Policy:\s*(.+)")
 
 # =========================
 # DATA STRUCTURES
 # =========================
-task_periods      = {}
-task_deadlines    = {}
-task_execution_time = {}
-intervals         = {}
-exec_start_times  = {}
-preempted_tasks   = set()
-time_offset       = None
-scheduling_policy = "Unknown Policy"
+task_periods         = {}
+task_deadlines       = {}
+task_execution_time  = {}
+scheduling_policy    = "Unknown Policy"
+
+# Raw IN/OUT events per task: list of ("IN"|"OUT", tick)
+raw_events = defaultdict(list)
 
 # =========================
 # PARSE LOG FILE
@@ -42,9 +39,9 @@ with open(LOG_FILE, "r") as f:
         task_info = TASK_INFO_RE.search(line)
         if task_info:
             name = task_info.group(1)
-            task_periods[name]   = int(task_info.group(2))
-            task_deadlines[name] = int(task_info.group(3))
-            task_execution_time[name]      = int(task_info.group(4))
+            task_periods[name]        = int(task_info.group(2))
+            task_deadlines[name]      = int(task_info.group(3))
+            task_execution_time[name] = int(task_info.group(4))
             continue
 
         policy_match = POLICY_RE.search(line)
@@ -52,56 +49,52 @@ with open(LOG_FILE, "r") as f:
             scheduling_policy = policy_match.group(1).strip()
             continue
 
-        start_match = START_EXEC_RE.search(line)
-        if start_match:
-            task = start_match.group(1)
-            tick = int(start_match.group(2))
-            if time_offset is None:
-                time_offset = tick
-            exec_start_times[task] = tick - time_offset
-            continue
-
-        end_match = END_EXEC_RE.search(line)
-        if end_match:
-            task = end_match.group(1)
-            tick = int(end_match.group(2))
-            if task in IGNORE_TASKS:
-                continue
-            if task in exec_start_times:
-                start_time = exec_start_times[task]
-                end_time   = tick - time_offset
-                duration   = end_time - start_time
-                if duration > 0:
-                    intervals.setdefault(task, []).append((start_time, duration))
-                del exec_start_times[task]
-            preempted_tasks.discard(task)
+        in_match = IN_RE.search(line)
+        if in_match:
+            task = in_match.group(1)
+            tick = int(in_match.group(2))
+            if task not in IGNORE_TASKS:
+                raw_events[task].append(("IN", tick))
             continue
 
         out_match = OUT_RE.search(line)
         if out_match:
             task = out_match.group(1)
             tick = int(out_match.group(2))
-            if task in IGNORE_TASKS:
-                continue
-            if task in exec_start_times:
-                start_time = exec_start_times[task]
-                end_time   = tick - time_offset
-                duration   = end_time - start_time
-                if duration > 0:
-                    intervals.setdefault(task, []).append((start_time, duration))
-                del exec_start_times[task]
-                preempted_tasks.add(task)
+            if task not in IGNORE_TASKS:
+                raw_events[task].append(("OUT", tick))
             continue
 
-        in_match = IN_RE.search(line)
-        if in_match:
-            task = in_match.group(1)
-            tick = int(in_match.group(2))
-            if task in IGNORE_TASKS:
-                continue
-            if task in preempted_tasks and time_offset is not None:
-                exec_start_times[task] = tick - time_offset
-            continue
+# =========================
+# BUILD EXECUTION SLICES
+# Consecutive IN/OUT at the same tick = scheduler context-switch check,
+# treat as one continuous run by merging them before building slices.
+# A real slice is: IN at T1 ... OUT at T2 where T2 > T1.
+# =========================
+intervals = {}   # task -> [(start, duration), ...]
+
+for task, events in raw_events.items():
+    slices = []
+    pending_in = None
+
+    for kind, tick in events:
+        if kind == "IN":
+            if pending_in is None:
+                # Fresh entry into CPU
+                pending_in = tick
+            # If we already have a pending_in and get another IN,
+            # it means the scheduler re-checked and kept the task running:
+            # do nothing (keep the original pending_in).
+
+        elif kind == "OUT":
+            if pending_in is not None:
+                duration = tick - pending_in
+                if duration > 0:
+                    slices.append((pending_in, duration))
+                pending_in = None
+            # OUT without a preceding IN: ignore (shouldn't happen in clean logs)
+
+    intervals[task] = slices
 
 # =========================
 # SORT + MAX TIME
@@ -110,20 +103,54 @@ for task in intervals:
     intervals[task].sort()
 
 max_time = 0
-for task in intervals:
-    for start, dur in intervals[task]:
+for task, slices in intervals.items():
+    for start, dur in slices:
         max_time = max(max_time, start + dur)
 
 n = len(intervals)
 
 # =========================
-# JOB INDEX HELPER
+# JOB INDEX MAP
+# Assign job numbers by accumulating execution per task.
+# A job is complete when accumulated ticks >= execution_time.
+# slice_job_map[task][i] = job index for the i-th slice of that task.
 # =========================
-def get_job_index(task, slice_start):
-    period = task_periods.get(task)
-    if not period:
-        return 1
-    return int(slice_start) // int(period) + 1
+slice_job_map = {}
+
+for task, slices in intervals.items():
+    w           = task_execution_time.get(task, 0)
+    job_idx     = 1
+    acc         = 0
+    job_indices = []
+    for start, dur in slices:
+        job_indices.append(job_idx)
+        acc += dur
+        if w > 0 and acc >= w:
+            job_idx += 1
+            acc = 0
+    slice_job_map[task] = job_indices
+
+def get_job_index(task, slice_idx):
+    """Return job number for the slice at position slice_idx (0-based)."""
+    jmap = slice_job_map.get(task, [])
+    if slice_idx < len(jmap):
+        return jmap[slice_idx]
+    return 1
+
+# =========================
+# CUMULATIVE EXEC MAP
+# cum_exec_map[task][i] = cumulative execution within the job at slice i
+# =========================
+cum_exec_map = {}
+for task, slices in intervals.items():
+    w       = task_execution_time.get(task, 0)
+    job_acc = defaultdict(int)
+    cum     = []
+    for i, (start, dur) in enumerate(slices):
+        j = get_job_index(task, i)
+        job_acc[j] += dur
+        cum.append(job_acc[j])
+    cum_exec_map[task] = cum
 
 # =========================
 # HEADER
@@ -137,8 +164,8 @@ print(f"\n  Policy: {scheduling_policy}\n")
 # TASK PARAMETERS
 # =========================
 print("─── Task Parameters ───────────────────────────────────")
-print(f"{'Task':<8} {'Period':>8} {'Deadline':>10} {'Execution Time':>12}  {'Ui=Ci/Ti':>10}")
-print("─" * 52)
+print(f"{'Task':<8} {'Period':>8} {'Deadline':>10} {'Execution Time':>14}  {'Ui=Ci/Ti':>10}")
+print("─" * 56)
 total_util = 0.0
 for task in sorted(intervals.keys(), key=lambda t: task_periods.get(t, 9999)):
     p  = task_periods.get(task, 0)
@@ -146,9 +173,9 @@ for task in sorted(intervals.keys(), key=lambda t: task_periods.get(t, 9999)):
     w  = task_execution_time.get(task, 0)
     ui = w / p if p > 0 else 0
     total_util += ui
-    print(f"{task:<8} {p:>8} {d:>10} {w:>6}  {ui:>10.4f}")
-print("─" * 52)
-print(f"{'Total U:':<30} {total_util:.4f}  ({total_util*100:.2f}%)")
+    print(f"{task:<8} {p:>8} {d:>10} {w:>8}        {ui:>10.4f}")
+print("─" * 56)
+print(f"{'Total U:':<34} {total_util:.4f}  ({total_util*100:.2f}%)")
 
 # =========================
 # SCHEDULABILITY TEST
@@ -161,19 +188,16 @@ if n == 0:
     schedulable       = "NO TASKS"
 
 elif "EDF" in policy_upper:
-    # Necessary AND sufficient for implicit deadlines (Liu & Layland 1973)
     ok = total_util <= 1.0
     print("─── Schedulability Test: EDF ──────────────────────────")
     print("  Theorem: EDF is optimal.")
     print("  Schedulable iff  U = sum(Ci/Ti) <= 1")
     print("  (necessary and sufficient for implicit deadlines)")
     print(f"\n  U = {total_util:.4f}  {'<= 1.0  =>' if ok else '>  1.0   =>'} {'SCHEDULABLE' if ok else 'DEADLINE MISS POSSIBLE'}")
-    schedulable_label = "[OK]  SCHEDULABLE"          if ok else "[!!] DEADLINE MISS POSSIBLE"
-    schedulable       = "SCHEDULABLE"                if ok else "DEADLINE MISS POSSIBLE"
+    schedulable_label = "[OK]  SCHEDULABLE"             if ok else "[!!] DEADLINE MISS POSSIBLE"
+    schedulable       = "SCHEDULABLE"                   if ok else "DEADLINE MISS POSSIBLE"
 
 elif "DM" in policy_upper:
-    # Necessary:  U <= 1
-    # Sufficient: Hyperbolic bound  PROD(Ci/Di + 1) <= 2  (Bini et al. 2003)
     hyp = 1.0
     for task in intervals:
         d = task_deadlines.get(task, task_periods.get(task, 1))
@@ -202,8 +226,6 @@ elif "DM" in policy_upper:
     print(f"\n  Overall: {schedulable}")
 
 elif "RM" in policy_upper:
-    # Sufficient (1): Liu & Layland  U <= n*(2^(1/n) - 1)
-    # Sufficient (2): Hyperbolic     PROD(Ci/Ti + 1) <= 2  (Bini 2003, tighter)
     ll_bound = n * (2 ** (1 / n) - 1)
     ll_ok    = total_util <= ll_bound
 
@@ -248,60 +270,6 @@ else:
     schedulable_label = "[??] UNKNOWN POLICY"
 
 # =========================
-# EXECUTION SLICES
-# =========================
-print("\n─── Execution Slices per Task ─────────────────────────")
-total_exec = defaultdict(int)
-job_counts = defaultdict(int)
-for task in sorted(intervals.keys(), key=lambda t: task_periods.get(t, 9999)):
-    print(f"\n  {task}:")
-    for i, (start, dur) in enumerate(intervals[task], 1):
-        j = get_job_index(task, start)
-        print(f"    J{j} slice {i:<3}: [{start:>6} ──── {start+dur:>6}]  (dur={dur})")
-        total_exec[task] += dur
-    w = task_execution_time.get(task, 1)
-    job_counts[task] = round(total_exec[task] / w) if w > 0 else 0
-    print(f"    => Total exec: {total_exec[task]}  |  Jobs completed: {job_counts[task]}")
-
-# =========================
-# RESPONSE TIMES
-# =========================
-print("\n─── Response Times ────────────────────────────────────")
-print(f"{'Task':<8} {'Avg Resp':>10} {'Max Resp':>10} {'Execution Time':>12} {'Deadline':>10}  Status")
-print("─" * 60)
-for task in sorted(intervals.keys(), key=lambda t: task_periods.get(t, 9999)):
-    d = task_deadlines.get(task, 0)
-    w = task_execution_time.get(task, 0)
-    slices = intervals[task]
-    jobs = []
-    acc = 0
-    job_start = None
-    for start, dur in slices:
-        if job_start is None:
-            job_start = start
-        acc += dur
-        if acc >= w:
-            jobs.append(start + dur - job_start)
-            acc = 0
-            job_start = None
-    if jobs:
-        avg_r = sum(jobs) / len(jobs)
-        max_r = max(jobs)
-        miss  = "MISS !" if max_r > d else "OK"
-        print(f"{task:<8} {avg_r:>10.1f} {max_r:>10}  {w:>6} {d:>10}  {miss}")
-
-# =========================
-# ASCII GANTT
-# =========================
-print("\n╔══════════════════════════════════════════════════════╗")
-print("║                ASCII GANTT CHART                     ║")
-print("╚══════════════════════════════════════════════════════╝\n")
-for task in sorted(intervals.keys(), key=lambda t: task_periods.get(t, 9999)):
-    for start, dur in intervals[task]:
-        j = get_job_index(task, start)
-        print(f"  {task} J{j:<2}: [{start:>6} ──── {start+dur:>6}]")
-
-# =========================
 # GANTT DIAGRAM
 # =========================
 TASK_COLORS = {
@@ -329,8 +297,8 @@ for task in sorted_tasks:
                    facecolors=color, edgecolors='white',
                    linewidth=0.4, alpha=0.88)
 
-    for start, dur in intervals[task]:
-        j  = get_job_index(task, start)
+    for i, (start, dur) in enumerate(intervals[task]):
+        j  = get_job_index(task, i)
         cx = start + dur / 2
         if dur > 5:
             ax.text(cx, y + 0.42, f"J{j}",
@@ -340,12 +308,19 @@ for task in sorted_tasks:
     if task in task_periods:
         period   = task_periods[task]
         deadline = task_deadlines.get(task, period)
-        for t in range(0, max_time + period, period):
-            ax.annotate('', xy=(t, y + 0.05), xytext=(t, y - 0.25),
-                        arrowprops=dict(arrowstyle='->', color='#00E676', lw=1.2))
-            dl = t + deadline
-            if dl <= max_time + period:
-                ax.annotate('', xy=(dl, y + 0.8), xytext=(dl, y + 1.05),
+
+        for k in range(0, max_time // period + 2):
+            activation   = k * period
+            abs_deadline = activation + deadline
+
+            # Activation arrow (green, pointing up)
+            if activation <= max_time + period:
+                ax.annotate('', xy=(activation, y + 0.05), xytext=(activation, y - 0.25),
+                            arrowprops=dict(arrowstyle='->', color='#00E676', lw=1.2))
+
+            # Deadline arrow (red, pointing down)
+            if abs_deadline <= max_time + period:
+                ax.annotate('', xy=(abs_deadline, y + 0.8), xytext=(abs_deadline, y + 1.05),
                             arrowprops=dict(arrowstyle='->', color='#FF1744', lw=1.0))
 
     legend_patches.append(
@@ -355,7 +330,7 @@ for task in sorted_tasks:
     y += 1.4
 
 min_period = min(task_periods.values()) if task_periods else 100
-xticks = list(range(0, max_time + min_period, min_period))
+xticks     = list(range(0, max_time + min_period, min_period))
 ax.set_xticks(xticks)
 ax.set_xticklabels([str(t) for t in xticks], fontsize=7, color='#b0bec5', rotation=45)
 
@@ -390,6 +365,9 @@ ax.annotate('▼ deadline',   xy=(0.08, 0.02), xycoords='axes fraction',
 ax.set_title(f"{scheduling_policy}  —  Gantt Chart",
              color='#eceff1', fontsize=13, fontweight='bold', pad=14)
 
+# =========================
+# HOVER TOOLTIP
+# =========================
 annot = ax.annotate(
     "", xy=(0, 0), xytext=(10, 10),
     textcoords="offset points",
@@ -408,14 +386,16 @@ def on_hover(event):
     found = False
     for task_y, task in zip(yticks, sorted_tasks):
         if (task_y - 0.37) <= event.ydata <= (task_y + 0.37):
-            for start, dur in intervals[task]:
+            for i, (start, dur) in enumerate(intervals[task]):
                 if start <= x <= start + dur:
-                    j = get_job_index(task, start)
+                    j      = get_job_index(task, i)
+                    w      = task_execution_time.get(task, '?')
+                    cumexe = cum_exec_map.get(task, [])[i] if i < len(cum_exec_map.get(task, [])) else '?'
                     annot.xy = (x, event.ydata)
                     annot.set_text(
                         f"{task}  J{j}\n"
                         f"start={start}  end={start+dur}\n"
-                        f"dur={dur}  execution_time={task_execution_time.get(task,'?')}"
+                        f"dur={dur}  exec={cumexe}/{w}"
                     )
                     annot.set_visible(True)
                     fig.canvas.draw_idle()
