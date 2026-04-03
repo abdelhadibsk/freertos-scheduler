@@ -2,8 +2,7 @@
 MAIN START
 Tasks created and registered:
   Task A: period=200  deadline=200  execution_time=100
-  Task B: period=400  deadline=400  execution_time=200
-  Task C: period=1000  deadline=1000  execution_time=600
+  Task B: period=600  deadline=600  execution_time=20
 Policy: Earliest Deadline First (EDF)
 Starting scheduler
 [IN ] IDLE at 0
@@ -13,295 +12,120 @@ Starting scheduler
 [IN ] A at 1
 [OUT] A at 102
 [IN ] B at 102
-[OUT] B at 102
-[IN ] B at 102
-[OUT] B at 200
+[OUT] B at 103
+[IN ] B at 103
+[OUT] B at 124
+[IN ] IDLE at 124
+[OUT] IDLE at 200
 [IN ] A at 200
-[OUT] A at 201
-[IN ] A at 201
-[OUT] A at 301
-[IN ] B at 301
-[OUT] B at 302
-[IN ] B at 302
-[OUT] B at 400
+[OUT] A at 300
+[IN ] IDLE at 300
+[OUT] IDLE at 301
+[IN ] IDLE at 301
+[OUT] IDLE at 400
 [IN ] A at 400
-[OUT] A at 401
-[IN ] A at 401
-[OUT] A at 501
-[IN ] B at 501
-[OUT] B at 502
-[IN ] B at 502
-[OUT] B at 503
-[IN ] C at 503
-[OUT] C at 504
-[IN ] C at 504
-[OUT] C at 600
+[OUT] A at 500
+[IN ] IDLE at 500
+[OUT] IDLE at 501
+[IN ] IDLE at 501
+[OUT] IDLE at 600
 [IN ] A at 600
-[OUT] A at 601
-[IN ] A at 601
-[OUT] A at 702
-[IN ] C at 702
-[OUT] C at 703
-[IN ] C at 703
-[OUT] C at 800
-[IN ] A at 800
-[OUT] A at 800
+[OUT] A at 701
+[IN ] B at 701
+[OUT] B at 702
+[IN ] B at 702
+[OUT] B at 723
+[IN ] IDLE at 723
+[OUT] IDLE at 800
 [IN ] A at 800
 [OUT] A at 901
-[IN ] C at 901
-[OUT] C at 902
-[IN ] C at 902
-[OUT] C at 1000
+[IN ] IDLE at 901
+[OUT] IDLE at 902
+[IN ] IDLE at 902
+[OUT] IDLE at 1000
 [IN ] A at 1000
-[OUT] A at 1001
-[IN ] A at 1001
 [OUT] A at 1101
-[IN ] B at 1101
-[OUT] B at 1102
-[IN ] B at 1102
-[OUT] B at 1200
+[IN ] IDLE at 1101
+[OUT] IDLE at 1102
+[IN ] IDLE at 1102
+[OUT] IDLE at 1200
 [IN ] A at 1200
-[OUT] A at 1201
-[IN ] A at 1201
-[OUT] A at 1302
+[OUT] A at 1301
+[IN ] B at 1301
+[OUT] B at 1302
 [IN ] B at 1302
-[OUT] B at 1303
-[IN ] B at 1303
-[OUT] B at 1400
-[IN ] A at 1400
-[OUT] A at 1400
+[OUT] B at 1323
+[IN ] IDLE at 1323
+[OUT] IDLE at 1400
 [IN ] A at 1400
 [OUT] A at 1501
-[IN ] B at 1501
-[OUT] B at 1502
-[IN ] B at 1502
-[OUT] B at 1503
-[IN ] C at 1503
-[OUT] C at 1504
-[IN ] C at 1504
-[OUT] C at 1600
+[IN ] IDLE at 1501
+[OUT] IDLE at 1502
+[IN ] IDLE at 1502
+[OUT] IDLE at 1600
 [IN ] A at 1600
-[OUT] A at 1601
-[IN ] A at 1601
-[OUT] A at 1702
-[IN ] B at 1702
-[OUT] B at 1702
-[IN ] B at 1702
-[OUT] B at 1800
+[OUT] A at 1701
+[IN ] IDLE at 1701
+[OUT] IDLE at 1702
+[IN ] IDLE at 1702
+[OUT] IDLE at 1800
 [IN ] A at 1800
-[OUT] A at 1801
-[IN ] A at 1801
 [OUT] A at 1901
 [IN ] B at 1901
 [OUT] B at 1902
 [IN ] B at 1902
-[OUT] B at 2000
+[OUT] B at 1922
+[IN ] IDLE at 1922
+[OUT] IDLE at 2000
 [IN ] A at 2000
-[OUT] A at 2001
-[IN ] A at 2001
-[OUT] A at 2101
-[IN ] B at 2101
-[OUT] B at 2102
-[IN ] B at 2102
-[OUT] B at 2104
-[IN ] C at 2104
-[OUT] C at 2105
-[IN ] C at 2105
-[OUT] C at 2200
+[OUT] A at 2100
+[IN ] IDLE at 2100
+[OUT] IDLE at 2101
+[IN ] IDLE at 2101
+[OUT] IDLE at 2200
 [IN ] A at 2200
-[OUT] A at 2201
-[IN ] A at 2201
 [OUT] A at 2301
-[IN ] C at 2301
-[OUT] C at 2302
-[IN ] C at 2302
-[OUT] C at 2400
-[IN ] A at 2400
-[OUT] A at 2400
+[IN ] IDLE at 2301
+[OUT] IDLE at 2302
+[IN ] IDLE at 2302
+[OUT] IDLE at 2400
 [IN ] A at 2400
 [OUT] A at 2501
 [IN ] B at 2501
 [OUT] B at 2502
 [IN ] B at 2502
-[OUT] B at 2600
-[IN ] A at 2600
-[OUT] A at 2600
+[OUT] B at 2523
+[IN ] IDLE at 2523
+[OUT] IDLE at 2600
 [IN ] A at 2600
 [OUT] A at 2701
-[IN ] B at 2701
-[OUT] B at 2702
-[IN ] B at 2702
-[OUT] B at 2800
+[IN ] IDLE at 2701
+[OUT] IDLE at 2702
+[IN ] IDLE at 2702
+[OUT] IDLE at 2800
 [IN ] A at 2800
-[OUT] A at 2801
-[IN ] A at 2801
-[OUT] A at 2902
-[IN ] C at 2902
-[OUT] C at 2903
-[IN ] C at 2903
-[OUT] C at 2915
-[IN ] B at 2915
-[OUT] B at 2916
-[IN ] B at 2916
-[OUT] B at 2919
-[IN ] IDLE at 2919
+[OUT] A at 2900
+[IN ] IDLE at 2900
+[OUT] IDLE at 2901
+[IN ] IDLE at 2901
 [OUT] IDLE at 3000
 [IN ] A at 3000
 [OUT] A at 3101
-[IN ] C at 3101
-[OUT] C at 3101
-[IN ] C at 3101
-[OUT] C at 3200
-[IN ] A at 3200
-[OUT] A at 3200
+[IN ] B at 3101
+[OUT] B at 3102
+[IN ] B at 3102
+[OUT] B at 3123
+[IN ] IDLE at 3123
+[OUT] IDLE at 3200
 [IN ] A at 3200
 [OUT] A at 3301
-[IN ] B at 3301
-[OUT] B at 3301
-[IN ] B at 3301
-[OUT] B at 3400
+[IN ] IDLE at 3301
+[OUT] IDLE at 3302
+[IN ] IDLE at 3302
+[OUT] IDLE at 3400
 [IN ] A at 3400
-[OUT] A at 3401
-[IN ] A at 3401
-[OUT] A at 3502
-[IN ] B at 3502
-[OUT] B at 3503
-[IN ] B at 3503
-[OUT] B at 3600
-[IN ] A at 3600
-[OUT] A at 3601
-[IN ] A at 3601
-[OUT] A at 3701
-[IN ] B at 3701
-[OUT] B at 3702
-[IN ] B at 3702
-[OUT] B at 3705
-[IN ] C at 3705
-[OUT] C at 3706
-[IN ] C at 3706
-[OUT] C at 3800
-[IN ] A at 3800
-[OUT] A at 3800
-[IN ] A at 3800
-[OUT] A at 3901
-[IN ] C at 3901
-[OUT] C at 3902
-[IN ] C at 3902
-[OUT] C at 4000
-[IN ] A at 4000
-[OUT] A at 4001
-[IN ] A at 4001
-[OUT] A at 4102
-[IN ] B at 4102
-[OUT] B at 4103
-[IN ] B at 4103
-[OUT] B at 4200
-[IN ] A at 4200
-[OUT] A at 4201
-[IN ] A at 4201
-[OUT] A at 4302
-[IN ] B at 4302
-[OUT] B at 4303
-[IN ] B at 4303
-[OUT] B at 4400
-[IN ] A at 4400
-[OUT] A at 4400
-[IN ] A at 4400
-[OUT] A at 4501
-[IN ] B at 4501
-[OUT] B at 4502
-[IN ] B at 4502
-[OUT] B at 4507
-[IN ] C at 4507
-[OUT] C at 4508
-[IN ] C at 4508
-[OUT] C at 4600
-[IN ] A at 4600
-[OUT] A at 4600
-[IN ] A at 4600
-[OUT] A at 4701
-[IN ] C at 4701
-[OUT] C at 4702
-[IN ] C at 4702
-[OUT] C at 4800
-[IN ] A at 4800
-[OUT] A at 4801
-[IN ] A at 4801
-[OUT] A at 4902
-[IN ] C at 4902
-[OUT] C at 4903
-[IN ] C at 4903
-[OUT] C at 5000
-[IN ] A at 5000
-[OUT] A at 5001
-[IN ] A at 5001
-[OUT] A at 5101
-[IN ] B at 5101
-[OUT] B at 5101
-[IN ] B at 5101
-[OUT] B at 5200
-[IN ] A at 5200
-[OUT] A at 5200
-[IN ] A at 5200
-[OUT] A at 5301
-[IN ] B at 5301
-[OUT] B at 5302
-[IN ] B at 5302
-[OUT] B at 5400
-[IN ] A at 5400
-[OUT] A at 5401
-[IN ] A at 5401
-[OUT] A at 5502
-[IN ] B at 5502
-[OUT] B at 5503
-[IN ] B at 5503
-[OUT] B at 5505
-[IN ] C at 5505
-[OUT] C at 5506
-[IN ] C at 5506
-[OUT] C at 5522
-[IN ] IDLE at 5522
-[OUT] IDLE at 5600
-[IN ] A at 5600
-[OUT] A at 5701
-[IN ] B at 5701
-[OUT] B at 5702
-[IN ] B at 5702
-[OUT] B at 5800
-[IN ] A at 5800
-[OUT] A at 5801
-[IN ] A at 5801
-[OUT] A at 5902
-[IN ] B at 5902
-[OUT] B at 5903
-[IN ] B at 5903
-[OUT] B at 6000
-[IN ] A at 6000
-[OUT] A at 6001
-[IN ] A at 6001
-[OUT] A at 6101
-[IN ] B at 6101
-[OUT] B at 6102
-[IN ] B at 6102
-[OUT] B at 6104
-[IN ] C at 6104
-[OUT] C at 6105
-[IN ] C at 6105
-[OUT] C at 6200
-[IN ] A at 6200
-[OUT] A at 6201
-[IN ] A at 6201
-[OUT] A at 6302
-[IN ] C at 6302
-[OUT] C at 6303
-[IN ] C at 6303
-[OUT] C at 6400
-[IN ] A at 6400
-[OUT] A at 6401
-[IN ] A at 6401
-[OUT] A at 6502
-[IN ] B at 6502
-[OUT] B at 6503
-[IN ] B at 6503
-[OUT] B at 6600
-[IN ] A at 6600
+[OUT] A at 3501
+[IN ] IDLE at 3501
+[OUT] IDLE at 3502
+[IN ] IDLE at 3502
+[OUT] IDLE at 3600

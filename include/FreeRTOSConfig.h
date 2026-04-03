@@ -17,7 +17,7 @@
 
 /* ================= CPU & TICK ================= */
 
-#define configCPU_CLOCK_HZ              ( ( unsigned long ) 10000000 ) // 10 MHz CPU clock 
+#define configCPU_CLOCK_HZ              ( ( unsigned long ) 100000000 ) // 10 MHz CPU clock 
 #define configTICK_RATE_HZ              ( ( TickType_t ) 1000 ) /* 1ms tick */
 #define configUSE_16_BIT_TICKS          0
 

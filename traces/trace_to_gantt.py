@@ -67,9 +67,7 @@ with open(LOG_FILE, "r") as f:
 
 # =========================
 # BUILD EXECUTION SLICES
-# Consecutive IN/OUT at the same tick = scheduler context-switch check,
-# treat as one continuous run by merging them before building slices.
-# A real slice is: IN at T1 ... OUT at T2 where T2 > T1.
+# Only keep slices with duration >= 2 ticks (filter out context‑switch noise)
 # =========================
 intervals = {}   # task -> [(start, duration), ...]
 
@@ -80,20 +78,13 @@ for task, events in raw_events.items():
     for kind, tick in events:
         if kind == "IN":
             if pending_in is None:
-                # Fresh entry into CPU
                 pending_in = tick
-            # If we already have a pending_in and get another IN,
-            # it means the scheduler re-checked and kept the task running:
-            # do nothing (keep the original pending_in).
-
         elif kind == "OUT":
             if pending_in is not None:
                 duration = tick - pending_in
-                if duration > 0:
+                if duration >= 2:               # <-- FILTER: keep only slices >= 2 ticks
                     slices.append((pending_in, duration))
                 pending_in = None
-            # OUT without a preceding IN: ignore (shouldn't happen in clean logs)
-
     intervals[task] = slices
 
 # =========================
@@ -110,59 +101,54 @@ for task, slices in intervals.items():
 n = len(intervals)
 
 # =========================
-# JOB INDEX MAP
-# Assign job numbers by accumulating execution per task.
-# A job is complete when accumulated ticks >= execution_time.
-# slice_job_map[task][i] = job index for the i-th slice of that task.
+# JOB INDEX MAP (with the improved rule for handling near‑WCET slices)
 # =========================
 slice_job_map = {}
+cum_exec_map  = {}
 
 for task, slices in intervals.items():
-    w           = task_execution_time.get(task, 0)
+    w = task_execution_time.get(task, 0)
+    if w == 0:
+        slice_job_map[task] = [1] * len(slices)
+        cum_exec_map[task]  = [0] * len(slices)
+        continue
+
     job_idx     = 1
     acc         = 0
     job_indices = []
-    for start, dur in slices:
-        job_indices.append(job_idx)
-        acc += dur
-        if w > 0 and acc >= w:
+    cum_inside  = []
+
+    for (start, dur) in slices:
+        # If this slice is larger than the remaining budget, start a new job
+        if acc > 0 and dur > (w - acc):
             job_idx += 1
             acc = 0
+
+        job_indices.append(job_idx)
+        acc += dur
+        cum_inside.append(acc)
+
+        if acc >= w:
+            job_idx += 1
+            acc = 0
+
     slice_job_map[task] = job_indices
+    cum_exec_map[task]  = cum_inside
 
 def get_job_index(task, slice_idx):
-    """Return job number for the slice at position slice_idx (0-based)."""
     jmap = slice_job_map.get(task, [])
     if slice_idx < len(jmap):
         return jmap[slice_idx]
     return 1
 
 # =========================
-# CUMULATIVE EXEC MAP
-# cum_exec_map[task][i] = cumulative execution within the job at slice i
-# =========================
-cum_exec_map = {}
-for task, slices in intervals.items():
-    w       = task_execution_time.get(task, 0)
-    job_acc = defaultdict(int)
-    cum     = []
-    for i, (start, dur) in enumerate(slices):
-        j = get_job_index(task, i)
-        job_acc[j] += dur
-        cum.append(job_acc[j])
-    cum_exec_map[task] = cum
-
-# =========================
-# HEADER
+# HEADER & TASK PARAMETERS (unchanged)
 # =========================
 print("\n╔══════════════════════════════════════════════════════╗")
 print("║           SCHEDULING TRACE ANALYZER                  ║")
 print("╚══════════════════════════════════════════════════════╝")
 print(f"\n  Policy: {scheduling_policy}\n")
 
-# =========================
-# TASK PARAMETERS
-# =========================
 print("─── Task Parameters ───────────────────────────────────")
 print(f"{'Task':<8} {'Period':>8} {'Deadline':>10} {'Execution Time':>14}  {'Ui=Ci/Ti':>10}")
 print("─" * 56)
@@ -178,7 +164,7 @@ print("─" * 56)
 print(f"{'Total U:':<34} {total_util:.4f}  ({total_util*100:.2f}%)")
 
 # =========================
-# SCHEDULABILITY TEST
+# SCHEDULABILITY TESTS (unchanged)
 # =========================
 policy_upper = scheduling_policy.upper()
 
@@ -270,7 +256,7 @@ else:
     schedulable_label = "[??] UNKNOWN POLICY"
 
 # =========================
-# GANTT DIAGRAM
+# GANTT DIAGRAM (job numbers restored)
 # =========================
 TASK_COLORS = {
     task: color
@@ -297,10 +283,11 @@ for task in sorted_tasks:
                    facecolors=color, edgecolors='white',
                    linewidth=0.4, alpha=0.88)
 
+    # Draw job numbers on each slice (if wide enough)
     for i, (start, dur) in enumerate(intervals[task]):
-        j  = get_job_index(task, i)
+        j = get_job_index(task, i)
         cx = start + dur / 2
-        if dur > 5:
+        if dur > 5:   # only show label if slice is wide enough
             ax.text(cx, y + 0.42, f"J{j}",
                     ha='center', va='center',
                     fontsize=6.5, color='white', fontweight='bold')
@@ -313,12 +300,10 @@ for task in sorted_tasks:
             activation   = k * period
             abs_deadline = activation + deadline
 
-            # Activation arrow (green, pointing up)
             if activation <= max_time + period:
                 ax.annotate('', xy=(activation, y + 0.05), xytext=(activation, y - 0.25),
                             arrowprops=dict(arrowstyle='->', color='#00E676', lw=1.2))
 
-            # Deadline arrow (red, pointing down)
             if abs_deadline <= max_time + period:
                 ax.annotate('', xy=(abs_deadline, y + 0.8), xytext=(abs_deadline, y + 1.05),
                             arrowprops=dict(arrowstyle='->', color='#FF1744', lw=1.0))
@@ -366,7 +351,7 @@ ax.set_title(f"{scheduling_policy}  —  Gantt Chart",
              color='#eceff1', fontsize=13, fontweight='bold', pad=14)
 
 # =========================
-# HOVER TOOLTIP
+# HOVER TOOLTIP (unchanged)
 # =========================
 annot = ax.annotate(
     "", xy=(0, 0), xytext=(10, 10),

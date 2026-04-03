@@ -36,16 +36,16 @@ int main( void )
                    &tA );
 
     xRTTaskCreate( periodic_task, "B", 1024, NULL,
-                   pdMS_TO_TICKS( 400 ),
-                   pdMS_TO_TICKS( 400 ),
-                   pdMS_TO_TICKS( 200  ),
+                   pdMS_TO_TICKS( 600 ),
+                   pdMS_TO_TICKS( 600 ),
+                   pdMS_TO_TICKS( 20  ),
                    &tB );
 
-    xRTTaskCreate( periodic_task, "C", 1024, NULL,
+    /*xRTTaskCreate( periodic_task, "C", 1024, NULL,
                    pdMS_TO_TICKS( 1000 ),
                    pdMS_TO_TICKS( 1000 ),
                    pdMS_TO_TICKS( 600  ),
-                   &tC );
+                   &tC );*/
 
     /* Print registered task info using helper API */
     printf( "Tasks created and registered:\n" );
@@ -106,7 +106,7 @@ void periodic_task( void *pvParameters )
                 ( unsigned long ) xTaskGetTickCount(),
                 ( unsigned long ) execution_time );
         */
-       
+
         /* Exécute par tranches — accumule seulement le temps CPU réel.
          * Si préemptée entre deux tranches, le temps perdu n'est pas compté. */
         while( elapsed < execution_time )
