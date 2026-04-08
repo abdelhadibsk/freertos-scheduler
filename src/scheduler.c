@@ -47,7 +47,7 @@ BaseType_t xRTTaskCreate(
     {
         /* Register RT params — implemented in tasks.c, has TCB access */
         vApplicationRTTaskRegister( *pxCreatedTask, period, deadline, execution_time );
-
+        
         /* Suspend — TickHook controls first release */
         vTaskSuspend( *pxCreatedTask );
     }
@@ -99,9 +99,15 @@ void vApplicationSchedulerTickHook( void )
  * Called by vTaskSwitchContext() before highest priority selection.
  * Already inside a critical section — no extra protection needed.
  * ========================================================= */
-void vApplicationSchedulerUpdatePriorities( void )
+static BaseType_t xInPriorityUpdate = pdFALSE;
+ void vApplicationSchedulerUpdatePriorities( void )
 {   
-    // printf( "[PRIORITY UPDATE] Tick=%lu\n", ( unsigned long ) xTaskGetTickCount() );
+      if( xInPriorityUpdate == pdTRUE )
+        return;  // ← coupe la récursion
+
+    xInPriorityUpdate = pdTRUE;
+
+    // printf( "[PRIORITY UPDATE] Tick=%lu\n", ( unsigned long ) xTaskGetTickCount() ); // for debugging
 #if   ( configUSE_RM   == 1 )
     vRM_UpdatePriorities();
 #elif ( configUSE_DM   == 1 )
@@ -111,4 +117,5 @@ void vApplicationSchedulerUpdatePriorities( void )
 #elif ( configUSE_EDF  == 1 )
     vEDF_UpdatePriorities();
 #endif
+    xInPriorityUpdate = pdFALSE;
 }

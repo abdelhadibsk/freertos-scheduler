@@ -108,5 +108,6 @@ extern BaseType_t   xRTIsTaskReady( TaskHandle_t xTask );
 
 /* Safe priority setter — implemented in tasks.c */
 extern void         vRTSetTaskPriority( TaskHandle_t xTask, UBaseType_t uxPriority );
+extern void         prvSetTaskPriorityNoYield( TaskHandle_t xTask, UBaseType_t uxPriority );
 
 #endif /* SCHEDULER_H */

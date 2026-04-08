@@ -32,20 +32,20 @@ int main( void )
         xRTTaskCreate( periodic_task, "A", 1024, NULL,
                    pdMS_TO_TICKS( 200 ),   /* period   */
                    pdMS_TO_TICKS( 200 ),   /* deadline */
-                   pdMS_TO_TICKS( 100  ),   /* execution time */
+                   pdMS_TO_TICKS( 80  ),   /* execution time */
                    &tA );
 
     xRTTaskCreate( periodic_task, "B", 1024, NULL,
-                   pdMS_TO_TICKS( 600 ),
-                   pdMS_TO_TICKS( 600 ),
-                   pdMS_TO_TICKS( 20  ),
+                   pdMS_TO_TICKS( 300 ),
+                   pdMS_TO_TICKS( 300 ),
+                   pdMS_TO_TICKS( 80  ),
                    &tB );
 
-    /*xRTTaskCreate( periodic_task, "C", 1024, NULL,
+    xRTTaskCreate( periodic_task, "C", 1024, NULL,
                    pdMS_TO_TICKS( 1000 ),
                    pdMS_TO_TICKS( 1000 ),
                    pdMS_TO_TICKS( 600  ),
-                   &tC );*/
+                   &tC );
 
     /* Print registered task info using helper API */
     printf( "Tasks created and registered:\n" );
@@ -114,7 +114,7 @@ void periodic_task( void *pvParameters )
             slice_start = xTaskGetTickCount();
 
             /* Tranche de travail — 1 tick à la fois */
-            while( xTaskGetTickCount() == slice_start )
+            while( xTaskGetTickCount()< (slice_start + 1) )
             {
                 /* busy work pendant exactement 1 tick */
             }

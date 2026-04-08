@@ -5496,5 +5496,79 @@ void vApplicationRTTaskRegister(
     taskEXIT_CRITICAL();
 }
 
+/*
+ * Internal helper for the RT scheduler.
+ * Mirrors vTaskPrioritySet() list/state updates, but deliberately omits the
+ * final yield because it is called from vTaskSwitchContext().
+ */
+void prvSetTaskPriorityNoYield( TaskHandle_t xTask, UBaseType_t uxNewPriority )
+{
+	TCB_t * pxTCB;
+	UBaseType_t uxCurrentBasePriority, uxPriorityUsedOnEntry;
+
+	configASSERT( ( uxNewPriority < configMAX_PRIORITIES ) );
+
+	if( uxNewPriority >= ( UBaseType_t ) configMAX_PRIORITIES )
+	{
+		uxNewPriority = ( UBaseType_t ) configMAX_PRIORITIES - ( UBaseType_t ) 1U;
+	}
+
+	if( uxNewPriority < ( tskIDLE_PRIORITY + 1U ) )
+	{
+		uxNewPriority = tskIDLE_PRIORITY + 1U;
+	}
+
+	pxTCB = prvGetTCBFromHandle( xTask );
+
+	#if ( configUSE_MUTEXES == 1 )
+	{
+		uxCurrentBasePriority = pxTCB->uxBasePriority;
+	}
+	#else
+	{
+		uxCurrentBasePriority = pxTCB->uxPriority;
+	}
+	#endif
+
+	if( uxCurrentBasePriority == uxNewPriority )
+	{
+		return;
+	}
+
+	uxPriorityUsedOnEntry = pxTCB->uxPriority;
+
+	#if ( configUSE_MUTEXES == 1 )
+	{
+		if( pxTCB->uxBasePriority == pxTCB->uxPriority )
+		{
+			pxTCB->uxPriority = uxNewPriority;
+		}
+
+		pxTCB->uxBasePriority = uxNewPriority;
+	}
+	#else
+	{
+		pxTCB->uxPriority = uxNewPriority;
+	}
+	#endif
+
+	if( ( listGET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ) ) & taskEVENT_LIST_ITEM_VALUE_IN_USE ) == 0UL )
+	{
+		listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) uxNewPriority ) );
+	}
+
+	if( listIS_CONTAINED_WITHIN( &( pxReadyTasksLists[ uxPriorityUsedOnEntry ] ), &( pxTCB->xStateListItem ) ) != pdFALSE )
+	{
+		if( uxListRemove( &( pxTCB->xStateListItem ) ) == ( UBaseType_t ) 0 )
+		{
+			portRESET_READY_PRIORITY( uxPriorityUsedOnEntry, uxTopReadyPriority );
+		}
+
+		prvAddTaskToReadyList( pxTCB );
+	}
+
+	( void ) uxPriorityUsedOnEntry;
+}
+
 #endif /* configUSE_RT_SCHEDULER */
 

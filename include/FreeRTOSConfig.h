@@ -4,7 +4,7 @@
 /* ================= CORE SCHEDULING ================= */
 
 #define configUSE_PREEMPTION            1   /* IMPORTANT */
-#define configUSE_TIME_SLICING          1
+#define configUSE_TIME_SLICING          1   /* No time slicing: tasks run until they block or yield */
 #define configRUN_MULTIPLE_PRIORITIES   1
 #define configNUMBER_OF_CORES           1
 
@@ -30,7 +30,7 @@
 
 /* ================= HOOKS ================= */
 
-#define configCHECK_FOR_STACK_OVERFLOW  2
+#define configCHECK_FOR_STACK_OVERFLOW  0   // to enable vApplicationStackOverflowHook
 #define configUSE_IDLE_HOOK             0   // to enable vApplicationIdleHook
 #define configUSE_TICK_HOOK             0   // to enable vApplicationTickHook
 #define configUSE_TASK_STATE_HOOK       0   // to enable vApplicationTaskStateHook
